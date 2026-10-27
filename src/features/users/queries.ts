@@ -1,4 +1,4 @@
-import { Role } from "@/generated/prisma/browser";
+import { OfficerPosition, Role } from "@/generated/prisma/browser";
 import { Prisma } from "@/generated/prisma/client";
 import {
   decodeTimestampCursor,
@@ -15,10 +15,8 @@ export interface UserManagementRow {
   name: string | null;
   email: string;
   role: Role;
+  officerPosition: OfficerPosition | null;
   isActive: boolean | null;
-  clubId: string | null;
-  clubName: string | null;
-  clubShortName: string | null;
   createdAt: Date;
 }
 
@@ -109,10 +107,9 @@ export async function getUserManagementPage(
             name: true,
             email: true,
             role: true,
+            officerPosition: true,
             isActive: true,
             createdAt: true,
-            clubId: true,
-            club: { select: { name: true, shortName: true } },
           },
         })
       : [],
@@ -129,9 +126,8 @@ export async function getUserManagementPage(
             id: true,
             email: true,
             role: true,
+            officerPosition: true,
             assignedAt: true,
-            clubId: true,
-            club: { select: { name: true, shortName: true } },
           },
         })
       : [],
@@ -144,10 +140,8 @@ export async function getUserManagementPage(
       name: user.name,
       email: user.email,
       role: user.role,
+      officerPosition: user.officerPosition,
       isActive: user.isActive,
-      clubId: user.clubId,
-      clubName: user.club?.name ?? null,
-      clubShortName: user.club?.shortName ?? null,
       createdAt: user.createdAt,
     })),
     ...pending.map((assignment) => ({
@@ -156,10 +150,8 @@ export async function getUserManagementPage(
       name: null,
       email: assignment.email,
       role: assignment.role,
+      officerPosition: assignment.officerPosition,
       isActive: null,
-      clubId: assignment.clubId,
-      clubName: assignment.club?.name ?? null,
-      clubShortName: assignment.club?.shortName ?? null,
       createdAt: assignment.assignedAt,
     })),
   ].sort(compareRowsDescending);
@@ -175,30 +167,61 @@ export async function getUserManagementPage(
   };
 }
 
-export async function getUserById(
-  userId: string,
-): Promise<{ id: string; role: Role; isActive: boolean | null } | null> {
+export interface UserAuthorization {
+  id: string;
+  role: Role;
+  officerPosition: OfficerPosition | null;
+  isActive: boolean | null;
+}
+
+export async function getUserById(userId: string): Promise<UserAuthorization | null> {
   return prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, role: true, isActive: true },
+    select: {
+      id: true,
+      role: true,
+      officerPosition: true,
+      isActive: true,
+    },
   });
 }
 
-export async function countActivePrivilegedUsers(excludeUserId?: string): Promise<number> {
+export interface PresidentSummary {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export async function getPresident(): Promise<PresidentSummary | null> {
+  return prisma.user.findFirst({
+    where: {
+      role: Role.OFFICER,
+      officerPosition: OfficerPosition.PRESIDENT,
+      isActive: true,
+    },
+    select: { id: true, name: true, email: true },
+  });
+}
+
+export async function countActiveAdmins(excludeUserId?: string): Promise<number> {
   return prisma.user.count({
     where: {
       isActive: true,
-      role: { in: [Role.ADMIN, Role.DEV] },
+      role: Role.ADMIN,
       ...(excludeUserId ? { id: { not: excludeUserId } } : {}),
     },
   });
 }
 
-// Development-only sign-in list (ADR-0008): only the accounts the seed creates.
-export async function getDevSignInAccounts() {
-  return prisma.user.findMany({
-    where: { email: { in: DEMO_ACCOUNTS.map((account) => account.email) } },
-    select: { email: true, role: true },
-    orderBy: { email: "asc" },
+export async function countActiveUsersByRole(role: Role): Promise<number> {
+  return prisma.user.count({
+    where: {
+      isActive: true,
+      role,
+    },
   });
+}
+
+export async function countPendingRoleAssignments(): Promise<number> {
+  return prisma.pendingRoleAssignment.count();
 }

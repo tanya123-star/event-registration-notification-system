@@ -7,7 +7,7 @@ The application does not store passwords. Every sign-in goes through Google. Sch
 invited the address and approved external access.
 
 The sign-in page is public and offers one action: **Continue with Google**. After the OAuth round trip, the application
-decides whether the person may enter and, for a first-time user, what role and club they receive.
+decides whether the person may enter and, for a first-time user, what role (and officer position) they receive.
 
 ## How sign-in is decided
 
@@ -17,17 +17,18 @@ decides whether the person may enter and, for a first-time user, what role and c
    invited external address with external access approved.
 4. A first-time user is created from their pending invitation. Without one, a school account starts as a student and the
    developer email starts as a developer.
-5. The session is issued with the user's current role, club, and active status. Those values are refreshed from the
-   database rather than frozen at sign-in.
+5. The session is issued with the user's current role, officer position, and active status. Those values are refreshed
+   from the database rather than frozen at sign-in.
 
 A deactivated account gets the clearer deactivation message before the domain check runs. An unapproved external address
 never becomes a user record.
 
 ## Invitations
 
-Inviting is an admin capability. The form collects an email, a role, an optional club, and an external-email decision.
-The role picker offers student, officer, and admin; the developer role is reserved for bootstrap and cannot be assigned
-through the UI.
+Inviting is an admin capability. The form collects an email, a role, an optional officer position, and an external-email
+decision. The role picker offers student, officer, and admin; the developer role is reserved for bootstrap and cannot be
+assigned through the UI. The officer position is accepted only for the officer role; inviting an officer with the
+President position makes them the single global President on first sign-in.
 
 The invitation is stored as a pending record. It is a decision made before the person arrives, not a user account. The
 email is the identity key, so inviting the same address again updates the pending record instead of creating a
@@ -41,16 +42,17 @@ because an external admin receives full administrative access.
 
 ### First sign-in and re-invites
 
-The first successful sign-in consumes the invitation. The new account receives the pending role and club, the external
-approval is copied when relevant, and the pending record is deleted.
+The first successful sign-in consumes the invitation. The new account receives the pending role and officer position, the
+external approval is copied when relevant, and the pending record is deleted. A pending President replaces a sitting
+President in the same transaction.
 
-If the email already belongs to an existing user, a new pending record is not applied. The existing role, club, and
+If the email already belongs to an existing user, a new pending record is not applied. The existing role, position, and
 external-email setting stay as they are. Re-inviting an existing user therefore does not change their access; this is a
 known limitation.
 
 ### Cancelling
 
-An admin can cancel a pending invitation from **Manage Users**. This deletes the pending record. If the person has not
+An admin can cancel a pending invitation from **People**. This deletes the pending record. If the person has not
 signed in yet, they can no longer create an account through that invitation. If they already have an account,
 cancelling a newer pending record has no effect on it.
 
@@ -65,15 +67,16 @@ Role changes and deactivations do not require the person to sign out and back in
 database, so the next protected request sees the current role and active status.
 
 - Deactivation blocks sign-in, existing sessions, and action guards. Reactivation restores access with the same role and
-  club.
+  active-status state. Deactivating a President clears the officer position.
 - A role change is visible on the next request. An admin page guard redirects if the new role no longer has access.
 - If an admin changes their own role to a non-admin role, the client sends them to a notice page instead of leaving them
   on a page they can no longer use.
-- An admin or developer can deactivate themselves only when another privileged account remains; the user is then sent to
-  the deactivated notice page.
+- An admin or developer can deactivate themselves only when another active admin remains (a developer is a recovery
+  account and does not count as the second admin); the user is then sent to the deactivated notice page.
 
-The system also protects itself from losing its last privileged operator. The last active admin or developer cannot be
-demoted or deactivated. The developer role cannot be assigned or edited through the normal role workflow.
+The system also protects itself from losing its last active admin. The last active admin cannot be demoted or
+deactivated. The developer role cannot be assigned or edited through the normal role workflow, and no one may change
+their own role in either direction.
 
 There is no user deletion workflow. Deactivation is the supported way to remove access while keeping the account's
 history and references intact.
@@ -95,9 +98,9 @@ These pages contain no application data. They exist so expected access changes d
 
 ## Authorization
 
-The central permission matrix is the policy. It grants capabilities by role and records whether a grant applies to all
-records or only the user's own club where relevant. The matrix is mirrored in [RBAC.md](./RBAC.md); a policy change is
-not complete until both are updated.
+The central permission matrix is the policy. It grants capabilities by role, and the officer position refines the Officer
+column (for example, only the President may create events or tasks). There is no club scoping. The matrix is mirrored in
+[RBAC.md](./RBAC.md); a policy change is not complete until both are updated.
 
 Every protected write starts with a server-side guard. Page-level guards perform the same evaluation for reads but
 redirect to a notice page on expected failures. Actions throw typed errors that their catch path turns into safe

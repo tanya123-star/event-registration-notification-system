@@ -14,6 +14,7 @@
     gap: var(--space-md);
     width: 100%;
     min-width: 0;
+    min-height: 2.5rem;
     padding: var(--space-sm) var(--space-md);
     font-size: var(--font-size-sm);
     font-family: inherit;
@@ -24,7 +25,9 @@
     cursor: default;
     outline: none;
     box-shadow: none;
-    transition: border-color var(--transition-base);
+    transition:
+      border-color var(--transition-base),
+      background-color var(--transition-base);
 
     &[data-hovered] {
       transform: none;
@@ -34,18 +37,19 @@
 
     &[data-pressed] {
       transform: none;
-      background-color: var(--color-surface-bg);
+      background-color: var(--color-surface-hover);
     }
 
     &[data-focus-visible] {
       border-color: var(--color-brand-accent);
-      outline: 2px solid var(--color-brand-accent--focus);
-      outline-offset: -1px;
+      outline: 2px solid var(--color-brand-accent);
+      outline-offset: 1px;
     }
 
     &[data-disabled] {
       color: var(--color-text-muted);
-      opacity: 0.6;
+      background: var(--color-surface-bg-alt);
+      opacity: 0.7;
       cursor: not-allowed;
       pointer-events: auto;
     }

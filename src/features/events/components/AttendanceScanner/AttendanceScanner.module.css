@@ -1,0 +1,362 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: 84rem;
+  margin: 0 auto;
+
+  .header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-lg);
+
+    .headerCopy {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-brand-accent);
+    }
+
+    .title {
+      margin: 0;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-semi-bold);
+      color: var(--color-text-primary);
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .select {
+      min-width: 18rem;
+      max-width: 24rem;
+    }
+  }
+
+  .layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+    align-items: flex-start;
+  }
+
+  .main {
+    display: flex;
+    flex: 2 1 32rem;
+    flex-direction: column;
+    gap: var(--space-lg);
+    min-width: 0;
+  }
+
+  .sidebar {
+    display: flex;
+    flex: 1 1 18rem;
+    flex-direction: column;
+    gap: var(--space-lg);
+    min-width: 0;
+  }
+
+  .panelTitle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin: 0;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semi-bold);
+    color: var(--color-text-primary);
+  }
+
+  .panelHint {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .cameraPanel,
+  .manualPanel,
+  .confirmPanel,
+  .successPanel,
+  .statCard,
+  .recentCard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background-color: var(--color-surface-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .cameraHeader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+
+    .cameraStatus {
+      padding: 2px var(--space-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      color: var(--color-text-secondary);
+      background-color: var(--color-surface-bg-alt);
+      border-radius: var(--radius-pill);
+    }
+  }
+
+  .cameraViewport {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-bg-inverse);
+    border-radius: var(--radius-md);
+    aspect-ratio: 4 / 3;
+
+    .camera {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .scanOverlay {
+      position: absolute;
+      inset: 18% 18%;
+      border: 2px solid var(--color-brand-accent--focus);
+      border-radius: var(--radius-md);
+      box-shadow: 0 0 0 9999px rgb(15 36 64 / 35%);
+      pointer-events: none;
+    }
+  }
+
+  .cameraPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    aspect-ratio: 4 / 3;
+    padding: var(--space-lg);
+    text-align: center;
+    color: var(--color-text-muted);
+    background-color: var(--color-surface-bg-alt);
+    border: 1px dashed var(--color-border-default);
+    border-radius: var(--radius-md);
+
+    p {
+      margin: 0;
+      font-size: var(--font-size-sm);
+    }
+
+    svg {
+      width: var(--icon-size-lg);
+      height: var(--icon-size-lg);
+    }
+  }
+
+  .cameraControls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+
+    .cameraSelect {
+      min-width: 14rem;
+    }
+  }
+
+  .cameraHint {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  .cameraError,
+  .notice {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    margin: 0;
+    padding: var(--space-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-danger);
+    background-color: var(--color-danger-bg);
+    border-radius: var(--radius-md);
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
+
+  .manualForm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-md);
+
+    > :first-child {
+      flex: 1 1 16rem;
+    }
+  }
+
+  .confirmHeader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+
+    .methodPill {
+      padding: 2px var(--space-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      color: var(--color-event-status-registered-text);
+      background-color: var(--color-event-status-registered-bg);
+      border-radius: var(--radius-pill);
+    }
+  }
+
+  .details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin: 0;
+
+    .detailRow {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin: 0;
+
+      dt {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-muted);
+      }
+
+      dd {
+        margin: 0;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text-primary);
+        text-align: right;
+      }
+    }
+  }
+
+  .reference {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: 0.02em;
+  }
+
+  .confirmActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+  }
+
+  .successPanel {
+    border-color: var(--color-success);
+
+    .successText {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .statCard {
+    .statMeta {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .statList {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      margin: 0;
+
+      .detailRow {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-md);
+        margin: 0;
+
+        dt {
+          font-size: var(--font-size-sm);
+          color: var(--color-text-muted);
+        }
+
+        dd {
+          margin: 0;
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-semi-bold);
+          color: var(--color-text-primary);
+        }
+      }
+    }
+
+    .progress {
+      width: 100%;
+      height: 0.5rem;
+      accent-color: var(--color-brand-accent);
+    }
+  }
+
+  .recentCard {
+    .recentList {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .recentRow {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border-subtle);
+
+      &:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+    }
+
+    .recentName {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+
+    .recentMeta {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    .recentEmpty {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+  }
+}

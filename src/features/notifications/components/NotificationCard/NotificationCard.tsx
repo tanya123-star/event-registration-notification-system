@@ -1,41 +1,48 @@
 "use client";
 
 import clsx from "clsx";
+import { FaBullhorn } from "react-icons/fa6";
 
-import { ClubLabel } from "@/features/clubs/components/ClubLabel/ClubLabel";
-import { formatDateTime } from "@/lib/primitives/date";
+import { timeAgo } from "@/lib/primitives/date";
 
 import type { NotificationRow } from "../../queries";
 import styles from "./NotificationCard.module.css";
 
 interface NotificationCardProps {
   notification: NotificationRow;
-  onOpen: (notification: NotificationRow) => void;
+  isSelected: boolean;
+  onSelect: (notification: NotificationRow) => void;
 }
 
-export function NotificationCard({ notification, onOpen }: NotificationCardProps) {
+export function NotificationCard({ notification, isSelected, onSelect }: NotificationCardProps) {
   return (
-    <div className={clsx(styles.card, !notification.isRead && styles.unread)}>
+    <button
+      type="button"
+      className={clsx(styles.card, !notification.isRead && styles.unread)}
+      aria-current={isSelected ? "true" : undefined}
+      onClick={() => onSelect(notification)}
+    >
       <span className={styles.dot} aria-hidden="true" />
       <span className={styles.content}>
         <span className={styles.header}>
-          <button type="button" className={styles.titleButton} onClick={() => onOpen(notification)}>
-            <strong className={styles.title}>{notification.title}</strong>
-          </button>
-          <time className={styles.time} dateTime={notification.createdAt.toISOString()}>
-            {formatDateTime(notification.createdAt)}
+          <span className={styles.title}>{notification.title}</span>
+          <time
+            className={styles.time}
+            dateTime={notification.createdAt.toISOString()}
+            suppressHydrationWarning
+          >
+            {timeAgo(notification.createdAt)}
           </time>
         </span>
         <span className={styles.body}>{notification.body}</span>
-        {notification.clubName && (
-          <ClubLabel
-            name={notification.clubName}
-            shortName={notification.clubShortName}
-            className={styles.club}
-          />
-        )}
+        <span className={styles.tags}>
+          <span className={styles.chip}>
+            <FaBullhorn aria-hidden="true" />
+            Campus-wide
+          </span>
+        </span>
       </span>
       {!notification.isRead && <span className={styles.srOnly}>Unread</span>}
-    </div>
+    </button>
   );
 }

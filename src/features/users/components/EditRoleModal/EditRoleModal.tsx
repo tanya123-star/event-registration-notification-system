@@ -7,14 +7,12 @@ import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { Select, SelectItem } from "@/components/ui/Select/Select";
 import { updateUserRoleAction } from "@/features/users/actions";
+import { assignableRoles, roleLabels, type AssignableRole } from "@/features/users/constants";
 import { UpdateUserRoleSchema, type UpdateUserRolePayload } from "@/features/users/schemas";
-import { Role } from "@/generated/prisma/browser";
 import { useModalForm } from "@/lib/hooks/useModalForm";
 import { createFieldValidator } from "@/lib/validation/form-utils";
 
 import styles from "./EditRoleModal.module.css";
-
-type AssignableRole = (typeof ASSIGNABLE_ROLES)[number];
 
 interface EditRoleModalProps {
   userId: string;
@@ -22,7 +20,7 @@ interface EditRoleModalProps {
   initialRole: AssignableRole;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSuccess?: (selfDemoted: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function EditRoleModal({
@@ -35,13 +33,10 @@ export function EditRoleModal({
 }: EditRoleModalProps) {
   const [role, setRole] = useState<AssignableRole>(initialRole);
 
-  const { isPending, submitForm, handleCancel } = useModalForm<
-    UpdateUserRolePayload,
-    { selfDemoted: boolean }
-  >({
+  const { isPending, submitForm, handleCancel } = useModalForm<UpdateUserRolePayload>({
     submit: updateUserRoleAction,
     onOpenChange,
-    onSuccess: (data) => onSuccess?.(data?.selfDemoted ?? false),
+    onSuccess,
     successMessage: "Role updated",
     successDescription: "The user's role has been updated.",
     failureMessage: "Failed to update role",
@@ -68,14 +63,14 @@ export function EditRoleModal({
             value={role}
             onChange={(value) => {
               const selectedRole = String(value) as AssignableRole;
-              if (ASSIGNABLE_ROLES.includes(selectedRole)) setRole(selectedRole);
+              if (assignableRoles.includes(selectedRole)) setRole(selectedRole);
             }}
             validate={createFieldValidator(UpdateUserRoleSchema.shape.role)}
             isDisabled={isPending}
           >
-            {ASSIGNABLE_ROLES.map((item) => (
+            {assignableRoles.map((item) => (
               <SelectItem key={item} id={item}>
-                {item}
+                {roleLabels[item]}
               </SelectItem>
             ))}
           </Select>

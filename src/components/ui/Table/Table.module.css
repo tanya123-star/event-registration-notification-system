@@ -19,7 +19,7 @@
   }
 
   &[data-scrolled] .tableHeader {
-    box-shadow: 0 4px 8px rgba(15, 36, 64, 0.06);
+    box-shadow: var(--shadow-sm);
   }
 }
 
@@ -38,7 +38,8 @@
   forced-color-adjust: none;
 
   &[data-focus-visible] {
-    outline: 2px solid var(--color-brand-accent--focus);
+    outline: 2px solid var(--color-brand-accent);
+    outline-offset: -2px;
   }
 
   &[data-drop-target] {
@@ -47,25 +48,29 @@
   }
 
   &:has(.tableBody[data-empty]) {
-    min-height: 100px;
+    min-height: 120px;
   }
 
   .tableHeader {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: var(--color-surface-bg);
-    color: var(--color-text-primary);
+    color: var(--color-text-muted);
+    background: var(--color-surface-bg-alt);
 
     .column {
-      padding: var(--space-md);
-      text-align: left;
-      outline: none;
-      cursor: default;
-      border-bottom: 0.5px solid var(--color-border-default);
-      border-right: 0.5px solid var(--color-border-default);
       position: relative;
+      padding: var(--space-md) var(--space-lg);
+      font-size: var(--font-size-xs);
       font-weight: var(--font-weight-semi-bold);
+      letter-spacing: 0.04em;
+      text-align: left;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: default;
+      border-bottom: 1px solid var(--color-border-subtle);
+      border-right: none;
+      outline: none;
 
       &:last-child {
         border-right: none;
@@ -76,11 +81,11 @@
       }
 
       &[data-pressed] {
-        background: var(--color-surface-bg-alt);
+        background: var(--color-surface-hover);
       }
 
       &[data-focus-visible] {
-        outline: 2px solid var(--color-brand-accent--focus);
+        outline: 2px solid var(--color-brand-accent);
         outline-offset: -2px;
       }
 
@@ -91,19 +96,20 @@
       .columnHeader {
         display: flex;
         align-items: center;
+        gap: var(--space-xs);
 
         .columnName {
           flex: 1;
-          font: inherit;
-          text-align: start;
-          color: inherit;
-          white-space: nowrap;
           overflow: hidden;
+          font: inherit;
+          color: inherit;
+          text-align: start;
           text-overflow: ellipsis;
+          white-space: nowrap;
           outline: none;
 
           &[data-focus-visible] {
-            outline: 2px solid var(--color-brand-accent--focus);
+            outline: 2px solid var(--color-brand-accent);
             outline-offset: -2px;
           }
         }
@@ -116,15 +122,15 @@
         }
 
         .columnResizer {
-          background-color: var(--color-border-default);
-          padding: 0 var(--space-sm);
-          translate: var(--space-lg) 0;
+          flex: 0 0 auto;
           height: 32px;
           margin: -16px 0 0 calc(-2 * var(--space-sm));
-          flex: 0 0 auto;
-          touch-action: none;
-          box-sizing: content-box;
+          padding: 0 var(--space-sm);
+          background-color: var(--color-border-default);
           background-clip: content-box;
+          box-sizing: content-box;
+          translate: var(--space-lg) 0;
+          touch-action: none;
 
           &[data-resizable-direction="both"],
           &[data-resizable-direction="left"],
@@ -134,7 +140,7 @@
 
           &[data-focus-visible] {
             background-color: var(--color-brand-accent);
-            outline: 2px solid var(--color-brand-accent--focus);
+            outline: 2px solid var(--color-brand-accent);
             outline-offset: -2px;
           }
 
@@ -170,25 +176,23 @@
   .tableBody {
     &[data-empty] {
       text-align: center;
-      font-style: italic;
       color: var(--color-text-muted);
     }
 
     .row {
-      outline: none;
-      cursor: default;
       color: var(--color-text-primary);
-      transform: scale(1);
+      cursor: default;
+      outline: none;
       transition: background-color var(--transition-fast);
       -webkit-tap-highlight-color: transparent;
 
       &[data-focus-visible] {
-        outline: 2px solid var(--color-brand-accent--focus);
+        outline: 2px solid var(--color-brand-accent);
         outline-offset: -2px;
       }
 
       .cell {
-        border-bottom: 0.5px solid var(--color-border-subtle);
+        border-bottom: 1px solid var(--color-border-subtle);
       }
 
       &[data-hovered] {
@@ -200,10 +204,11 @@
       }
 
       &[data-selected] {
-        background: var(--color-surface-hover);
+        background: var(--color-brand-accent-soft);
+        box-shadow: inset 2px 0 0 var(--color-brand-accent);
 
         &[data-hovered] {
-          background: var(--color-surface-hover);
+          background: var(--color-brand-accent-soft);
         }
 
         &[data-pressed] {
@@ -231,10 +236,10 @@
       }
 
       .cell {
-        padding: var(--space-md);
+        padding: var(--space-md) var(--space-lg);
         text-align: left;
+        border-right: none;
         outline: none;
-        border-right: 0.5px solid var(--color-border-subtle);
         word-break: break-word;
         -webkit-tap-highlight-color: transparent;
 
@@ -243,7 +248,7 @@
         }
 
         &[data-focus-visible] {
-          outline: 2px solid var(--color-brand-accent--focus);
+          outline: 2px solid var(--color-brand-accent);
           outline-offset: -2px;
         }
 
@@ -278,15 +283,15 @@
           justify-content: center;
           width: var(--space-lg);
           height: var(--space-lg);
-          cursor: grab;
           color: var(--color-text-muted);
+          cursor: grab;
 
           &:active {
             cursor: grabbing;
           }
 
           &[data-focus-visible] {
-            outline: 1px solid var(--color-brand-accent--focus);
+            outline: 2px solid var(--color-brand-accent);
           }
         }
 
@@ -295,15 +300,15 @@
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          vertical-align: middle;
-          margin-inline-end: var(--space-sm);
-          cursor: pointer;
           width: var(--space-lg);
           height: var(--space-lg);
+          margin-inline-end: var(--space-sm);
           flex-shrink: 0;
+          vertical-align: middle;
+          cursor: pointer;
 
           &[data-focus-visible] {
-            outline: 2px solid var(--color-brand-accent--focus);
+            outline: 2px solid var(--color-brand-accent);
           }
 
           svg {
@@ -318,8 +323,8 @@
     }
 
     .loadMoreItem td {
+      padding: var(--space-lg);
       text-align: center;
-      padding: var(--space-md);
     }
   }
 }

@@ -9,9 +9,10 @@
   .card {
     width: min(100%, 27rem);
     padding: var(--space-4xl) var(--space-3xl);
+    border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-lg);
     background: var(--color-surface-bg);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-sm);
     text-align: center;
 
     .brandMark {
@@ -22,9 +23,11 @@
 
     .greetings {
       color: var(--color-text-primary);
+      font-family: var(--font-family-sans);
       font-size: var(--font-size-2xl);
       font-weight: var(--font-weight-semi-bold);
-      line-height: 36px;
+      line-height: var(--line-height-tight);
+      text-wrap: balance;
     }
 
     .description {

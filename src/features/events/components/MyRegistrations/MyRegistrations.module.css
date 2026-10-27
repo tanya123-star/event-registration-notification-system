@@ -1,0 +1,164 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: 80rem;
+  margin: 0 auto;
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+  }
+
+  .browse {
+    margin-left: auto;
+  }
+
+  .tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    background-color: var(--color-surface-bg-alt);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-pill);
+
+    .tab {
+      padding: var(--space-sm) var(--space-md);
+      color: var(--color-text-secondary);
+      font-weight: var(--font-weight-medium);
+      white-space: nowrap;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-pill);
+      transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast);
+
+      &[data-hovered] {
+        transform: none;
+        color: var(--color-text-primary);
+        background-color: var(--color-surface-hover);
+      }
+
+      &[data-active="true"] {
+        color: var(--color-text-primary);
+        background-color: var(--color-surface-bg);
+        border-color: var(--color-border-subtle);
+      }
+
+      &[data-focus-visible] {
+        border-color: var(--color-brand-accent);
+      }
+    }
+  }
+
+  .tableWrap {
+    overflow-x: auto;
+    background-color: var(--color-surface-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .table {
+    width: 100%;
+    min-width: 44rem;
+    border-collapse: collapse;
+    text-align: left;
+
+    th {
+      padding: var(--space-md) var(--space-lg);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      background-color: var(--color-surface-bg-alt);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: var(--space-lg);
+      font-size: var(--font-size-sm);
+      vertical-align: middle;
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .eventTitle {
+      display: block;
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+
+    .eventOrganizer {
+      display: block;
+      margin-top: 2px;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .date {
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .reference {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: var(--font-size-sm);
+      letter-spacing: 0.02em;
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .cancelledPill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px var(--space-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      line-height: var(--line-height-normal);
+      color: var(--color-event-status-closed-text);
+      background-color: var(--color-event-status-closed-bg);
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-sm);
+      white-space: nowrap;
+    }
+  }
+
+  .empty {
+    padding: var(--space-3xl) var(--space-lg);
+    text-align: center;
+    background-color: var(--color-surface-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+
+    .emptyTitle {
+      margin: 0 0 var(--space-sm);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semi-bold);
+    }
+
+    .emptyText {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .footnote {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+}

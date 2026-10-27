@@ -4,24 +4,24 @@ import { useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa6";
 
 import { Button } from "@/components/ui/Button/Button";
-import { ListToolbar } from "@/components/ui/ListToolbar/ListToolbar";
 import { ProgressCircle } from "@/components/ui/ProgressCircle/ProgressCircle";
-import type { FilterDefinition } from "@/components/ui/TableFilter/TableFilter";
 import {
   getNotificationPageAction,
+  markAllNotificationsReadAction,
   markNotificationReadAction,
 } from "@/features/notifications/actions";
 import { NotificationCard } from "@/features/notifications/components/NotificationCard/NotificationCard";
-import { NotificationDetailModal } from "@/features/notifications/components/NotificationDetailModal/NotificationDetailModal";
+import { NotificationDetail } from "@/features/notifications/components/NotificationDetail/NotificationDetail";
 import { SendNotificationModal } from "@/features/notifications/components/SendNotificationModal/SendNotificationModal";
 import type { NotificationRow } from "@/features/notifications/queries";
 import { useUnreadCount } from "@/features/notifications/unread-count-context";
-import { toastActionError } from "@/lib/hooks/toast-utils";
+import { toastActionError, toastSuccess } from "@/lib/hooks/toast-utils";
 import { useCursorPagination } from "@/lib/hooks/useCursorPagination";
-import { useDebounce } from "@/lib/hooks/useDebounce";
-import type { FilterValues } from "@/lib/primitives/types";
+import type { PageQuery } from "@/lib/primitives/types";
 
 import styles from "./NotificationsFeed.module.css";
+
+type NotificationTab = "all" | "unread";
 
 interface NotificationsFeedProps {
   initialNotifications: NotificationRow[];
@@ -29,39 +29,28 @@ interface NotificationsFeedProps {
   canCompose: boolean;
 }
 
-const notificationFilters: FilterDefinition[] = [
-  {
-    key: "status",
-    label: "Status",
-    options: [
-      { value: "unread", label: "Unread" },
-      { value: "read", label: "Read" },
-    ],
-  },
+const tabs: { id: NotificationTab; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "unread", label: "Unread" },
 ];
-
-function resolveEmptyMessage(search: string, hasActiveFilters: boolean): string {
-  if (search) return `No notifications matching "${search}".`;
-  if (hasActiveFilters) return "No notifications match the current filters.";
-  return "You do not have any notifications yet.";
-}
 
 export function NotificationsFeed({
   initialNotifications,
   initialCursor,
   canCompose,
 }: NotificationsFeedProps) {
-  const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState<FilterValues>({});
+  const [tab, setTab] = useState<NotificationTab>("all");
   const [isComposeOpen, setIsComposeOpen] = useState(false);
-  const [selected, setSelected] = useState<NotificationRow | null>(null);
-  const debouncedSearch = useDebounce(search, 300);
-  const { decrement } = useUnreadCount();
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(initialNotifications[0]?.id ?? null);
+  const { count, setCount, decrement } = useUnreadCount();
+
+  const query: PageQuery = tab === "unread" ? { filters: { status: ["unread"] } } : {};
 
   const { items, setItems, hasMore, isInitialLoad, isLoadingMore, loadMore, refresh } =
     useCursorPagination({
       fetchPage: getNotificationPageAction,
-      query: { search: debouncedSearch, filters },
+      query,
       initialRows: initialNotifications,
       initialCursor,
     });
@@ -87,8 +76,15 @@ export function NotificationsFeed({
     return () => observer.disconnect();
   }, [hasMore, isLoadingMore, items.length]);
 
-  async function handleOpen(notification: NotificationRow) {
-    setSelected(notification);
+  const selected = items.find((item) => item.id === selectedId) ?? items[0] ?? null;
+  const emptyMessage =
+    tab === "unread"
+      ? "You have no unread notifications."
+      : "You do not have any notifications yet.";
+
+  async function handleSelect(notification: NotificationRow) {
+    setSelectedId(notification.id);
+    setIsDetailOpen(true);
     if (notification.isRead) return;
 
     const response = await markNotificationReadAction({ notificationId: notification.id });
@@ -99,56 +95,93 @@ export function NotificationsFeed({
     setItems((prev) =>
       prev.map((item) => (item.id === notification.id ? { ...item, isRead: true } : item)),
     );
-    setSelected((current) =>
-      current && current.id === notification.id ? { ...current, isRead: true } : current,
-    );
     decrement();
   }
 
-  const hasActiveFilters = Object.values(filters).some((selected) => selected.length > 0);
-  const isEmpty = !isInitialLoad && items.length === 0;
-  const emptyMessage = resolveEmptyMessage(debouncedSearch, hasActiveFilters);
+  async function handleMarkAllRead() {
+    const response = await markAllNotificationsReadAction();
+    if (!response.success) {
+      toastActionError(response, "mark all notifications as read");
+      return;
+    }
+    setItems((prev) => prev.map((item) => ({ ...item, isRead: true })));
+    setCount(0);
+    toastSuccess("All notifications marked as read", "You're all caught up.");
+    if (tab === "unread") refresh();
+  }
 
   return (
     <div className={styles.page}>
-      <ListToolbar
-        search={search}
-        onSearchChange={setSearch}
-        searchPlaceholder="Search notifications..."
-        searchLabel="Search notifications"
-        filters={notificationFilters}
-        filterValues={filters}
-        onFiltersChange={setFilters}
-      >
-        {canCompose && (
-          <Button className={styles.addButton} onPress={() => setIsComposeOpen(true)}>
-            <FaPlus aria-hidden="true" />
-            Send notification
+      <div className={styles.toolbar}>
+        <div className={styles.tabs} role="group" aria-label="Filter notifications">
+          {tabs.map((entry) => {
+            const isActive = entry.id === tab;
+            return (
+              <Button
+                key={entry.id}
+                variant="ghost"
+                className={styles.tab}
+                data-active={isActive}
+                aria-pressed={isActive}
+                onPress={() => {
+                  setTab(entry.id);
+                  setIsDetailOpen(false);
+                }}
+              >
+                {entry.id === "unread" && count > 0 ? `${entry.label} (${count})` : entry.label}
+              </Button>
+            );
+          })}
+        </div>
+
+        <div className={styles.toolbarActions}>
+          {canCompose && (
+            <Button variant="secondary" onPress={() => setIsComposeOpen(true)}>
+              <FaPlus aria-hidden="true" />
+              Send notification
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            className={styles.markAll}
+            isDisabled={count === 0}
+            onPress={() => void handleMarkAllRead()}
+          >
+            Mark all as read
           </Button>
-        )}
-      </ListToolbar>
+        </div>
+      </div>
 
       {isInitialLoad ? (
         <div className={styles.status}>
           <ProgressCircle aria-label="Loading notifications..." />
         </div>
-      ) : isEmpty ? (
+      ) : items.length === 0 ? (
         <p className={styles.empty}>{emptyMessage}</p>
       ) : (
-        <div ref={listRef} className={styles.list}>
-          {items.map((notification) => (
-            <NotificationCard
-              key={notification.id}
-              notification={notification}
-              onOpen={(entry) => void handleOpen(entry)}
-            />
-          ))}
-          {hasMore && (
-            <div ref={sentinelRef} className={styles.sentinel}>
-              {isLoadingMore && <ProgressCircle aria-label="Loading more notifications..." />}
+        <div className={styles.layout} data-detail-open={isDetailOpen}>
+          <div ref={listRef} className={styles.list}>
+            {items.map((notification) => (
+              <NotificationCard
+                key={notification.id}
+                notification={notification}
+                isSelected={notification.id === selected?.id}
+                onSelect={(entry) => void handleSelect(entry)}
+              />
+            ))}
+            {hasMore && (
+              <div ref={sentinelRef} className={styles.sentinel}>
+                {isLoadingMore && <ProgressCircle aria-label="Loading more notifications..." />}
+              </div>
+            )}
+            {!hasMore && <p className={styles.end}>You&apos;re all caught up.</p>}
+          </div>
+
+          {selected && (
+            <div className={styles.detailPanel}>
+              <NotificationDetail notification={selected} onBack={() => setIsDetailOpen(false)} />
             </div>
           )}
-          {!hasMore && <p className={styles.end}>You&apos;re all caught up.</p>}
         </div>
       )}
 
@@ -157,14 +190,6 @@ export function NotificationsFeed({
           isOpen={isComposeOpen}
           onOpenChange={setIsComposeOpen}
           onSuccess={refresh}
-        />
-      )}
-      {selected && (
-        <NotificationDetailModal
-          notification={selected}
-          onOpenChange={(open) => {
-            if (!open) setSelected(null);
-          }}
         />
       )}
     </div>

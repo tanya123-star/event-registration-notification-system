@@ -1,27 +1,32 @@
 .page {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: var(--page-padding);
+  min-height: 100dvh;
+  padding: var(--space-2xl) var(--space-lg);
+  background: var(--color-app-bg);
 
   .content {
-    max-width: var(--auth-content-max-width);
+    width: min(100%, 30rem);
+    padding: clamp(var(--space-2xl), 6vw, var(--space-4xl));
     text-align: center;
+    background: var(--color-surface-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
 
     .title {
+      margin: 0 0 var(--space-md);
       font-size: var(--font-size-2xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--color-danger);
-      margin-bottom: var(--space-lg);
+      font-weight: var(--font-weight-semi-bold);
+      color: var(--color-text-primary);
     }
 
     .message {
+      margin: 0 0 var(--space-xl);
       font-size: var(--font-size-md);
-      color: var(--color-text-secondary);
       line-height: var(--line-height-relaxed);
-      margin-bottom: var(--space-xl);
+      color: var(--color-text-secondary);
     }
   }
 }

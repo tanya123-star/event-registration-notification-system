@@ -1,0 +1,31 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-normal);
+  white-space: nowrap;
+}
+
+.open {
+  color: var(--color-event-status-open-text);
+  background-color: var(--color-event-status-open-bg);
+}
+
+.registered {
+  color: var(--color-event-status-registered-text);
+  background-color: var(--color-event-status-registered-bg);
+}
+
+.full {
+  color: var(--color-event-status-full-text);
+  background-color: var(--color-event-status-full-bg);
+}
+
+.closed {
+  color: var(--color-event-status-closed-text);
+  background-color: var(--color-event-status-closed-bg);
+}

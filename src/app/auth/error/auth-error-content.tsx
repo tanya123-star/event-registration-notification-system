@@ -18,11 +18,6 @@ const errorMap: Record<string, { title: string; message: string }> = {
     message:
       "You don't have permission to sign in with this account. Your account may have been deactivated. If this is a mistake, please contact your administrator.",
   },
-  Forbidden: {
-    title: "Access denied",
-    message:
-      "You don't have permission to view this page. Contact your administrator if you need access.",
-  },
   Domain: {
     title: "Email domain not allowed",
     message: `Use your school account (${SCHOOL_EMAIL_DOMAINS_TEXT}), or ask an administrator to invite this email.`,

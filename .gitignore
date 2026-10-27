@@ -50,3 +50,8 @@ next-env.d.ts
 /src/generated/prisma/
 
 .direnv/
+
+# AI agent tooling
+/.opencode/
+.superpowers/
+

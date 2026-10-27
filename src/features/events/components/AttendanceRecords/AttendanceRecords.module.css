@@ -1,0 +1,155 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  max-width: 84rem;
+  margin: 0 auto;
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    .eyebrow {
+      margin: 0;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-brand-accent);
+    }
+
+    .title {
+      margin: 0;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-semi-bold);
+      color: var(--color-text-primary);
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .summary {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  .tableWrap {
+    overflow-x: auto;
+    background-color: var(--color-surface-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .table {
+    width: 100%;
+    min-width: 52rem;
+    border-collapse: collapse;
+    text-align: left;
+
+    th {
+      padding: var(--space-md) var(--space-lg);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      background-color: var(--color-surface-bg-alt);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: var(--space-lg);
+      font-size: var(--font-size-sm);
+      vertical-align: middle;
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .studentName {
+      display: block;
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+
+    .studentMeta {
+      display: block;
+      margin-top: 2px;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    .eventTitle {
+      color: var(--color-text-secondary);
+    }
+
+    .reference {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: var(--font-size-sm);
+      letter-spacing: 0.02em;
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .date {
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .recordedBy {
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    .qrPill,
+    .manualPill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px var(--space-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+
+    .qrPill {
+      color: var(--color-event-status-registered-text);
+      background-color: var(--color-event-status-registered-bg);
+    }
+
+    .manualPill {
+      color: var(--color-event-status-closed-text);
+      background-color: var(--color-event-status-closed-bg);
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .empty {
+    padding: var(--space-3xl) var(--space-lg);
+    text-align: center;
+    background-color: var(--color-surface-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+
+    .emptyTitle {
+      margin: 0 0 var(--space-sm);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semi-bold);
+    }
+
+    .emptyText {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+  }
+}

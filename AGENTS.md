@@ -11,7 +11,8 @@ defaults.
 - Read the actual file first. Don't assume you know what's in it.
 - Make the smallest coherent change that solves the request. Avoid unrelated refactors and speculative abstractions.
 - Refractors are always accepted as long as it improves correctness, readability, maintainability and consistency.
-- Most conventions in this repository are derived from the `law-firm-management-system` project (or locally
+- Most conventions in this repository are derived from the
+  [law-firm-management-system](https://github.com/four4Bytes/law-firm-management-system)(remote) project (or locally
   `Repositories/projects/law-firm-management-system`). Adopt useful patterns and vendor utilities as needed.
 - After making changes, run only the commands the touched files need.
 
@@ -354,3 +355,13 @@ default function` for these files.
   components, so document the user-facing operation, each `@param`, and the returned `ActionStatusResponse` /
   `ActionDataResponse` / read shape. Use `@throws` for guards that throw instead of returning an envelope.
 - Keep descriptions concise and within the 100-character print width; Prettier will reformat them as needed.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

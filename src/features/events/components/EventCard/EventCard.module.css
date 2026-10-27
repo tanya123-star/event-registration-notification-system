@@ -1,0 +1,109 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  height: 100%;
+  padding: var(--space-lg);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  background-color: var(--color-surface-bg);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-event-card);
+  transition:
+    background-color var(--transition-base),
+    border-color var(--transition-base),
+    transform var(--transition-slow);
+
+  &[data-hovered] {
+    z-index: 1;
+    background-color: var(--color-surface-hover);
+    transform: scale(1.02);
+  }
+
+  &[data-pressed] {
+    transform: scale(0.99);
+  }
+
+  &[data-focus-visible] {
+    outline: 2px solid var(--color-brand-accent);
+    outline-offset: 2px;
+  }
+
+  .topRow {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .dateTile {
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    align-items: center;
+    width: 3.25rem;
+    padding: var(--space-sm);
+    line-height: var(--line-height-tight);
+    color: var(--color-brand-accent);
+    background-color: var(--color-brand-accent-soft);
+    border-radius: var(--radius-md);
+
+    .month {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      letter-spacing: 0.04em;
+    }
+
+    .day {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+    }
+  }
+
+  .heading {
+    display: flex;
+    flex: 1 1 8rem;
+    flex-direction: column;
+    gap: var(--space-xs);
+    min-width: 0;
+
+    .title {
+      margin: 0;
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semi-bold);
+      line-height: var(--line-height-tight);
+    }
+
+    .organizer {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+  }
+
+  .status {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border-subtle);
+
+    .metaItem {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .metaIcon {
+      flex-shrink: 0;
+      width: var(--icon-size-sm);
+      height: var(--icon-size-sm);
+      color: var(--color-brand-accent);
+    }
+  }
+}

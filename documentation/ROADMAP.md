@@ -2,90 +2,39 @@
 
 ## Where the project stands
 
-The foundation is working: people sign in with Google, admins manage users and clubs, officers and admins send
-announcements, and everyone reads the announcements they are allowed to see.
+The foundations work end to end: sign-in, invitations, the People page with a global President, and campus-wide
+notifications. The student-facing event browser, registration, ticket, and attendance history exist as staged in-memory
+screens ready to be backed by the database.
 
-Event management and registration are the next substantial phase. The database already has event and attendance models,
-and the seed script creates sample data, but there are no event routes, actions, permissions, or UI.
+The following phases are already approved in [the KASAMA plan](../docs/superpowers/plans/2026-10-26-kasama-single-org.md):
 
-## The event phase
+1. **Single-organization model.** People rename, global President, campus-wide notifications, no club surfaces.
+2. **Tasks.** The President assigns tasks to Officers; Officers move their own tasks; Admins manage every task.
+3. **Events, mechanics, approval.** Real event data replaces the in-memory mock; Admin approval publishes an event.
+4. **Registration and QR.** Opaque references, optional capacity, cancel/re-register keeping the same reference.
+5. **Scanning and attendance.** QR and manual capture, walk-ins, scan permissions tied to open attendance tasks.
+6. **Final pass.** Navigation polish and documentation.
 
-The following order is a sensible starting point, not a commitment. Several steps depend on decisions that have not
-been made yet.
+## Decisions already recorded
 
-1. **Decide event permissions.** Define who may read, create, update, and delete events, and whether officers are limited
-   to their own club. Record the result in the permission matrix and [RBAC.md](./RBAC.md).
-2. **Separate registration from attendance.** Decide whether registration is a new model, an extension of attendance,
-   or something else. Registration needs states such as registered, cancelled, waitlisted, checked in, and no-show;
-   attendance currently only records a check-in.
-3. **Build event management.** Add the feature module, routes, and create/edit/delete UI. Decide how organisation-wide
-   events differ from club events.
-4. **Build the student view.** Students need to browse upcoming events, open details, register, and cancel. Visibility
-   should follow the same role and club rules as notifications.
-5. **Build check-in and attendance.** Decide how check-in is captured, where photos are stored, who can verify them, and
-   what privacy rules apply.
-6. **Connect events to notifications.** Let the composer select an event, or decide that event announcements stay
-   manual. Event notifications may eventually target registrants rather than a whole club.
-7. **Update tests and documentation.** Cover the new schemas and guards, and update the data model and permission docs.
+The design decisions are not open questions any more; they live in the approved ADRs:
 
-## Decisions still open
-
-### Who can manage events?
-
-Admins can plausibly manage every event. Officers are less obvious: should they create events only for their own club,
-for any club, or also organisation-wide events? The permission matrix already supports a distinction between all records
-and the user's own club, but the event policy has not been chosen.
-
-### What is registration?
-
-The existing attendance record answers "who showed up?" Registration also needs "who said they were coming?" and a way
-to cancel or waitlist. One model could carry all of those states, or registration and attendance could stay separate.
-The choice affects the student UI, capacity handling, and reporting.
-
-### What happens when an event is full?
-
-There is no capacity or waitlist model yet. If events are unlimited, registration can be a simple create/delete. If not,
-the system needs a capacity rule, a waitlist order, and a consistent answer for concurrent registrations.
-
-### Can external users register?
-
-External users can sign in when invited and can read notifications in the app, but they do not receive notification
-email. The event phase needs to decide whether they can register, whether they receive event email, and what club
-membership means for them.
-
-### How should check-in photos work?
-
-Attendance currently requires a photo reference, but there is no upload flow, storage setup, or access control around
-it. A real check-in feature needs to decide where files live, who can view them, how long they are kept, and whether a
-photo is required.
-
-### Are event notifications automatic?
-
-Event announcements are manual today. An event could send reminders automatically, notify registrants when details
-change, or stay entirely in the hands of the organiser. The notification model already allows an event link; the policy
-does not exist yet.
+- [ADR-0009](../docs/adr/0009-kasama-single-organization.md) covers the single-organization model, the global President,
+  one-step approval, and the deferred club-cleanup migration.
+- Roles and the central permission matrix are documented in [RBAC.md](./RBAC.md).
+- Scan permissions and the officer-task rule are documented there as well, and the scan flow re-checks every permission
+  server-side.
 
 ## Current limitations
 
-- There is no event management, browsing, registration, or check-in UI.
-- Attendance is a check-in record, not an RSVP, and only the seed script creates it.
-- Notification email goes only to active school accounts. External users see notifications in the app but not by email.
-- The composer cannot attach an event.
-- Re-inviting an existing user does not apply the new role, club, or external-email decision to their account.
+- The student-facing event pages still use staged in-memory data; the database-backed event lifecycle is a later phase.
+- Tasks, event approval, registration records, QR references, attendance capture, and the scan route still use the
+  default auth and nav readiness only.
+- Attendance is currently a seed-created check-in record; there is not yet a live scan router.
+- Notification email is deliberately not part of the current build; the shared helper survives for the invitation email.
+- The composer cannot attach an event yet.
+- Re-inviting an existing user does not apply the new role, officer position, or external-email decision to their account.
 - Notifications cannot be edited, deleted, scheduled, sent to one person, or delivered as push notifications.
-- There is no "mark all as read" action and no notification preference screen.
 - There is no user deletion workflow; deactivation is the removal path.
 - There is no audit log, application-level rate limiting, or email delivery tracking.
-- Email is sent after the database write, so a failed email does not roll back an invitation or notification.
-
-## A reasonable finish line for the event phase
-
-- Admins and permitted officers can create, edit, and delete events.
-- Students can browse upcoming events, open details, register, and cancel where allowed.
-- Capacity and waitlist rules are applied if those are adopted.
-- Attendance can be recorded and reviewed by the people responsible for the event.
-- Notifications can be linked to events, and automatic notices can be added if desired.
-- New actions are guarded, validated, documented in the permission matrix, and covered by allow/deny tests.
-- The relationship between registration and attendance is documented without ambiguity.
-
-None of that exists yet. The current application is the foundation it will build on.
+- Legacy `Club` and `clubId` database columns remain, awaiting the separately-approved cleanup migration.

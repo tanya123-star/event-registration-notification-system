@@ -1,0 +1,162 @@
+.detail {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-height: 0;
+  max-height: 100%;
+  padding: var(--space-xl);
+  overflow-y: auto;
+  background: var(--color-surface-bg);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+
+  .backButton {
+    display: none;
+    align-self: flex-start;
+    padding: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+
+    .audience {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .time {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-xs);
+    }
+  }
+
+  .title {
+    margin: var(--space-xs) 0 0;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semi-bold);
+    line-height: var(--line-height-tight);
+  }
+
+  .body {
+    margin: 0;
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-relaxed);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .eventSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+
+    .eventLabel {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .eventCard {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      background: var(--color-surface-bg-alt);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md);
+
+      .eventHeader {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+
+        .dateTile {
+          display: flex;
+          flex-direction: column;
+          flex-shrink: 0;
+          align-items: center;
+          justify-content: center;
+          width: 3rem;
+          padding: var(--space-sm) var(--space-xs);
+          color: var(--color-brand-accent);
+          background: var(--color-brand-accent-soft);
+          border-radius: var(--radius-sm);
+
+          .dateMonth {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semi-bold);
+            letter-spacing: 0.04em;
+          }
+
+          .dateDay {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semi-bold);
+            line-height: var(--line-height-tight);
+          }
+        }
+
+        .eventInfo {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-xs);
+          min-width: 0;
+
+          .eventTitle {
+            margin: 0;
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-semi-bold);
+            line-height: var(--line-height-tight);
+          }
+
+          .eventVenue {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+
+            svg {
+              width: 0.75em;
+              height: 0.75em;
+            }
+          }
+        }
+      }
+
+      .eventLink {
+        width: 100%;
+        color: var(--color-text-inverse);
+        background-color: var(--color-event-primary);
+        border-color: transparent;
+
+        &[data-hovered] {
+          background-color: var(--color-event-primary--hover);
+        }
+
+        &[data-pressed] {
+          background-color: var(--color-event-primary--active);
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 60rem) {
+  .detail {
+    .backButton {
+      display: flex;
+    }
+  }
+}

@@ -297,6 +297,23 @@ export function formatDateTime(date: Date | string): string {
 }
 
 /**
+ * Formats a `Date` or ISO string as an uppercase month abbreviation and day
+ * number, e.g. `{ month: "NOV", day: "12" }`.
+ *
+ * @param date - A Date object or ISO 8601 string.
+ * @returns The month abbreviation and day of the month in the app timezone.
+ */
+export function formatMonthDay(date: Date | string): { month: string; day: string } {
+  const d = toLocalDate(date);
+  return {
+    month: new Intl.DateTimeFormat("en-US", { timeZone: getAppTimeZone(), month: "short" })
+      .format(d)
+      .toUpperCase(),
+    day: new Intl.DateTimeFormat("en-US", { timeZone: getAppTimeZone(), day: "numeric" }).format(d),
+  };
+}
+
+/**
  * Returns a time-of-day greeting for the given instant, evaluated in the
  * given timezone. Morning is before 12:00, afternoon is 12:00–17:59,
  * evening is 18:00 onward. Defaults to the app timezone so server rendering

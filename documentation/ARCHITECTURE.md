@@ -49,7 +49,7 @@ shared modules should not import a feature's internals.
 **Page reads.** A server component runs a page-level access check, reads the initial data, and passes plain serialisable
 values into client components. Expected access failures redirect to a notice page instead of reaching an error boundary.
 
-**Lists.** The user, club, and notification lists use cursor pagination. The server applies search, filters, and sorting,
+**Lists.** The people and notification lists use cursor pagination. The server applies search, filters, and sorting,
 then returns a page of rows with a cursor for the next page. Client components request more through actions and append
 the results without keeping a second independent data store.
 
@@ -77,6 +77,19 @@ The generated Prisma client has separate server and browser entries. The server 
 modules that run in the browser, including the permission matrix and form schemas, use the browser entry so the
 production build does not pull server code into the client bundle.
 
+### Officer attendance
+
+`/dashboard` branches by role; Officers get attendance statistics for a selected published event. `/attendance/scanner`
+decodes QR codes in the browser with `@zxing/browser` and offers the same verification by manual reference entry.
+`/attendance/records` lists persisted check-ins with event, method, and day filters plus cursor pagination. The routes
+guard with `attendance.scan` and `attendance.view`.
+
+QR payloads are the opaque `KASAMA-…` registration reference generated at registration time; there is no second token
+format. `verifyAttendanceAction` only reads and returns a student/event summary. `recordAttendanceAction` writes through
+`recordAttendance`, which re-resolves the reference on the server, checks the event and registration state, and relies on
+the `(eventId, studentId)` unique constraint so concurrent scans create one row and one `already attended` result. No
+browser-supplied identity or eligibility value is trusted.
+
 ### Email is a side effect
 
 Invitations and notification emails are sent after the database write. They are not part of a transaction. If SMTP fails,
@@ -97,6 +110,5 @@ Storybook stories cover shared UI and double as browser tests. Unit tests sit ne
 
 ## What is not here
 
-There is no custom REST API for application data, no GraphQL layer, no client-side ORM, and no event feature module yet.
-The current workflows fit the server-rendered page and Server Action model. The event layer can be added as another
-feature slice when its data model and permissions are settled.
+There is no custom REST API for application data, no GraphQL layer, and no client-side ORM. The server-rendered page and
+Server Action model covers the current event, registration, and attendance workflows.

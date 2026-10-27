@@ -1,5 +1,8 @@
 # Simplified roles and approval
 
+> **Superseded in part.** [ADR-0009](./0009-kasama-single-organization.md) removes the club-scoped parts of this ADR
+> (officer contacts become a `Club` field) and replaces the multi-step approval chain with a one-step Admin approval.
+
 Amends ADRs 0001 (access roles and approval authority), 0002 (registration lifecycle), 0003 (attendance walk-in authority), 0004 (email delivery outcomes), 0005 (approval-chain model) and 0006 (deferred decisions). Every security and privacy guard from those ADRs stays in force; only the shapes below change.
 
 ## 1. Drop `ATTENDANCE_STAFF` from the model

@@ -1,18 +1,12 @@
 "use server";
 
-import { sendEmail } from "@/lib/messaging/email";
 import type { PageQuery } from "@/lib/primitives/types";
 import { actionInvalid, type ActionStatusResponse } from "@/lib/security/action-response";
 import { requireAuth, requirePermission } from "@/lib/security/auth-guards";
 import { toActionResponse } from "@/lib/security/errors";
 
-import { createNotification, markNotificationRead } from "./mutations";
-import {
-  getNotificationPage,
-  getNotificationRecipients,
-  getUnreadNotificationCount,
-  type NotificationPage,
-} from "./queries";
+import { createNotification, markAllNotificationsRead, markNotificationRead } from "./mutations";
+import { getNotificationPage, getUnreadNotificationCount, type NotificationPage } from "./queries";
 import {
   MarkNotificationReadSchema,
   NotificationPageQuerySchema,
@@ -23,10 +17,10 @@ import {
 import { buildNotificationScope } from "./scope";
 
 /**
- * Reads a cursor page of notifications visible to the signed-in user.
+ * Reads a cursor page of campus-wide notifications visible to the signed-in user.
  *
  * @param query - Search, sort, filter, cursor, and page-size parameters.
- * @returns A cursor page of notification rows scoped to the caller's role and club.
+ * @returns A cursor page of notification rows.
  * @throws When the caller lacks `notification.read`.
  */
 export async function getNotificationPageAction(query: PageQuery): Promise<NotificationPage> {
@@ -39,9 +33,9 @@ export async function getNotificationPageAction(query: PageQuery): Promise<Notif
 }
 
 /**
- * Counts unread notifications visible to the signed-in user.
+ * Counts unread campus-wide notifications for the signed-in user.
  *
- * @returns The unread notification count for the caller's scope.
+ * @returns The unread notification count.
  * @throws When the caller lacks `notification.read`.
  */
 export async function getUnreadNotificationCountAction(): Promise<number> {
@@ -71,9 +65,25 @@ export async function markNotificationReadAction(
 }
 
 /**
- * Creates a notification and emails the matching active recipients.
+ * Marks every campus-wide notification as read for the signed-in user.
  *
- * @param payload - Title, body, audience, and optional club id.
+ * @returns `success: true`, or a sanitized error envelope.
+ * @throws {ForbiddenError} When the caller lacks `notification.read`.
+ */
+export async function markAllNotificationsReadAction(): Promise<ActionStatusResponse> {
+  try {
+    const session = await requirePermission("notification.read");
+    await markAllNotificationsRead(buildNotificationScope(session));
+    return { success: true };
+  } catch (error) {
+    return toActionResponse(error, "mark all notifications as read");
+  }
+}
+
+/**
+ * Creates a campus-wide in-app notification.
+ *
+ * @param payload - Title and body.
  * @returns `success: true`, or an invalid envelope.
  * @throws {ForbiddenError} When the caller lacks `notification.create`.
  */
@@ -85,14 +95,6 @@ export async function sendNotificationAction(
     const parsed = SendNotificationSchema.safeParse(payload);
     if (!parsed.success) return actionInvalid("notification");
     await createNotification({ ...parsed.data, createdById: session.id });
-    const recipients = await getNotificationRecipients(parsed.data.audience, parsed.data.clubId);
-    if (recipients.length > 0) {
-      await sendEmail({
-        to: recipients.map((recipient) => recipient.email),
-        subject: parsed.data.title,
-        html: `<h1>${parsed.data.title}</h1><p>${parsed.data.body}</p>`,
-      });
-    }
     return { success: true };
   } catch (error) {
     return toActionResponse(error, "send notification");

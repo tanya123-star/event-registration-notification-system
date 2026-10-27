@@ -12,7 +12,6 @@ enum Role {
   OFFICER
   ADMIN
   DEV
-  APPROVER
 }
 
 enum NotificationAudience {
@@ -20,14 +19,45 @@ enum NotificationAudience {
   CLUB
 }
 
+enum OfficerPosition {
+  PRESIDENT
+}
+
 enum EventStatus {
   DRAFT
-  PENDING_APPROVAL
+  SUBMITTED
   REVISION_REQUESTED
-  REJECTED
   APPROVED
   PUBLISHED
   CANCELLED
+}
+
+enum EventApprovalAction {
+  SUBMITTED
+  APPROVED
+  REVISION_REQUESTED
+  CANCELLED
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  CANCELLED
+}
+
+enum AttendanceMethod {
+  QR
+  MANUAL
+}
+
+enum TaskType {
+  ATTENDANCE
+  GENERAL
+}
+
+enum TaskStatus {
+  ASSIGNED
+  IN_PROGRESS
+  DONE
 }
 
 model User {
@@ -37,31 +67,40 @@ model User {
   allowExternalEmail     Boolean                 @default(false)
   name                   String
   image                  String?
+  studentNumber          String?                 @unique
   role                   Role                    @default(STUDENT)
+  officerPosition        OfficerPosition?
   isActive               Boolean                 @default(true)
+  /// Legacy club membership. Read-only after the single-organization migration.
   clubId                 String?
   club                   Club?                   @relation(fields: [clubId], references: [id])
   createdAt              DateTime                @default(now())
   eventsCreated          Event[]                 @relation("EventCreator")
+  eventApprovals         EventApproval[]         @relation("EventApprovalActor")
+  registrations          Registration[]
   attendances            Attendance[]
   notificationsSent      Notification[]          @relation("NotificationSender")
   notificationReads      NotificationRead[]
   pendingAssignmentsMade PendingRoleAssignment[] @relation("AssignedBy")
-  auditLogs              AuditLog[]
+  tasksAssigned          Task[]                  @relation("TaskAssignee")
+  tasksCreated           Task[]                  @relation("TaskAssigner")
+  attendanceRecorded     Attendance[]            @relation("AttendanceRecorder")
   accounts               Account[]
   sessions               Session[]
 }
 
 model PendingRoleAssignment {
-  id                 String   @id @default(cuid())
-  email              String   @unique
+  id                 String           @id @default(cuid())
+  email              String           @unique
   role               Role
-  allowExternalEmail Boolean  @default(false)
+  officerPosition    OfficerPosition?
+  allowExternalEmail Boolean          @default(false)
+  /// Legacy club assignment. New invitations leave this null.
   clubId             String?
-  club               Club?    @relation(fields: [clubId], references: [id])
+  club               Club?            @relation(fields: [clubId], references: [id])
   assignedById       String
-  assignedBy         User     @relation("AssignedBy", fields: [assignedById], references: [id])
-  assignedAt         DateTime @default(now())
+  assignedBy         User             @relation("AssignedBy", fields: [assignedById], references: [id])
+  assignedAt         DateTime         @default(now())
 }
 
 model Club {
@@ -76,32 +115,98 @@ model Club {
 }
 
 model Event {
-  id            String         @id @default(cuid())
-  title         String
-  description   String?
-  venue         String
-  startAt       DateTime
-  endAt         DateTime?
-  clubId        String?
-  club          Club?          @relation(fields: [clubId], references: [id])
-  createdById   String
-  createdBy     User           @relation("EventCreator", fields: [createdById], references: [id])
-  createdAt     DateTime       @default(now())
-  status        EventStatus    @default(DRAFT)
-  attendances   Attendance[]
-  notifications Notification[]
+  id                   String          @id @default(cuid())
+  title                String
+  description          String?
+  venue                String
+  startAt              DateTime
+  endAt                DateTime?
+  /// Legacy club host. New events leave this null.
+  clubId               String?
+  club                 Club?           @relation(fields: [clubId], references: [id])
+  status               EventStatus     @default(DRAFT)
+  mechanics            String?
+  programFlow          String?
+  requirements         String?
+  publishedAt          DateTime?
+  capacity             Int?
+  registrationClosesAt DateTime?
+  createdById          String
+  createdBy            User            @relation("EventCreator", fields: [createdById], references: [id])
+  createdAt            DateTime        @default(now())
+  approvals            EventApproval[]
+  registrations        Registration[]
+  attendances          Attendance[]
+  notifications        Notification[]
+  tasks                Task[]
+
+  @@index([status, startAt, id])
+}
+
+model EventApproval {
+  id         String              @id @default(cuid())
+  eventId    String
+  event      Event               @relation(fields: [eventId], references: [id])
+  actorId    String
+  actor      User                @relation("EventApprovalActor", fields: [actorId], references: [id])
+  action     EventApprovalAction
+  fromStatus EventStatus
+  toStatus   EventStatus
+  comment    String?
+  createdAt  DateTime            @default(now())
+
+  @@index([eventId, createdAt])
+}
+
+model Registration {
+  id          String             @id @default(cuid())
+  eventId     String
+  event       Event              @relation(fields: [eventId], references: [id])
+  studentId   String
+  student     User               @relation(fields: [studentId], references: [id])
+  reference   String             @unique
+  status      RegistrationStatus @default(REGISTERED)
+  createdAt   DateTime           @default(now())
+  cancelledAt DateTime?
+
+  @@unique([eventId, studentId])
+  @@index([studentId, status])
+  @@index([eventId, status])
 }
 
 model Attendance {
-  id          String   @id @default(cuid())
-  eventId     String
-  event       Event    @relation(fields: [eventId], references: [id])
-  studentId   String
-  student     User     @relation(fields: [studentId], references: [id])
-  checkedInAt DateTime @default(now())
-  photoUrl    String
+  id           String           @id @default(cuid())
+  eventId      String
+  event        Event            @relation(fields: [eventId], references: [id])
+  studentId    String
+  student      User             @relation(fields: [studentId], references: [id])
+  checkedInAt  DateTime         @default(now())
+  photoUrl     String
+  method       AttendanceMethod @default(QR)
+  recordedById String?
+  recordedBy   User?            @relation("AttendanceRecorder", fields: [recordedById], references: [id])
 
   @@unique([eventId, studentId])
+  @@index([eventId, checkedInAt])
+}
+
+model Task {
+  id           String     @id @default(cuid())
+  eventId      String?
+  event        Event?     @relation(fields: [eventId], references: [id])
+  type         TaskType
+  assigneeId   String
+  assignee     User       @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  assignedById String
+  assignedBy   User       @relation("TaskAssigner", fields: [assignedById], references: [id])
+  dueAt        DateTime?
+  status       TaskStatus @default(ASSIGNED)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([assigneeId, status])
+  @@index([eventId, type])
+  @@index([assignedById])
 }
 
 model Notification {
@@ -111,6 +216,7 @@ model Notification {
   audience    NotificationAudience
   eventId     String?
   event       Event?               @relation(fields: [eventId], references: [id])
+  /// Legacy club audience. New notifications write null.
   clubId      String?
   club        Club?                @relation(fields: [clubId], references: [id])
   createdById String
@@ -130,20 +236,6 @@ model NotificationRead {
   readAt         DateTime     @default(now())
 
   @@unique([notificationId, userId])
-}
-
-model AuditLog {
-  id         String   @id @default(cuid())
-  entityType String
-  entityId   String
-  action     String
-  actorId    String
-  actor      User     @relation(fields: [actorId], references: [id])
-  actorRole  Role
-  details    Json
-  createdAt  DateTime @default(now())
-
-  @@index([entityType, entityId])
 }
 
 model Account {

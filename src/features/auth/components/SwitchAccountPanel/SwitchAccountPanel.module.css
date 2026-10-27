@@ -1,0 +1,39 @@
+.panel {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-bg-alt);
+  text-align: left;
+
+  .identity {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .name {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semi-bold);
+    line-height: var(--line-height-normal);
+    overflow-wrap: anywhere;
+  }
+
+  .meta {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+    overflow-wrap: anywhere;
+  }
+
+  .button {
+    width: 100%;
+    padding: var(--space-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semi-bold);
+  }
+}

@@ -1,0 +1,116 @@
+.header {
+  height: var(--layout-header-height);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding: 0 var(--space-3xl);
+  border-bottom: 1px solid var(--color-border-default);
+  background-color: var(--color-surface-bg);
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    min-width: 0;
+
+    .appName {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .divider {
+      flex-shrink: 0;
+      width: 1px;
+      height: var(--space-xl);
+      background-color: var(--color-border-default);
+    }
+
+    .pageTitle {
+      overflow: hidden;
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-brand-primary);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .user {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-md);
+
+    .avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-pill);
+      background-color: var(--color-brand-accent);
+      color: var(--color-text-inverse);
+
+      .userIcon {
+        width: var(--icon-size-sm);
+        height: var(--icon-size-sm);
+      }
+    }
+
+    .userName {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .roleBadge {
+      padding: 2px var(--space-sm);
+      border-radius: var(--radius-pill);
+      background-color: var(--color-brand-accent);
+      color: var(--color-text-inverse);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi-bold);
+      line-height: var(--line-height-normal);
+      white-space: nowrap;
+    }
+  }
+}
+
+@media (max-width: 60rem) {
+  .header {
+    .left {
+      .appName,
+      .divider {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 48rem) {
+  .header {
+    padding: 0 var(--space-lg);
+
+    .left {
+      flex: 1;
+
+      .pageTitle {
+        font-size: var(--font-size-md);
+      }
+    }
+
+    .user {
+      gap: var(--space-sm);
+
+      .userName {
+        display: none;
+      }
+    }
+  }
+}

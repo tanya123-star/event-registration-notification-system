@@ -49,6 +49,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
               initialCollapsed={initialCollapsed}
               userName={session?.user?.name}
               userRole={session?.user?.role}
+              officerPosition={session?.user?.officerPosition}
               userImage={session?.user?.image}
             />
             <div className={styles.main}>

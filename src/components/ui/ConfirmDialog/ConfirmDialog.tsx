@@ -13,6 +13,7 @@ interface ConfirmDialogProps {
   title: string;
   children: React.ReactNode;
   confirmLabel?: string;
+  cancelLabel?: string;
   onConfirm: () => void | Promise<void>;
 }
 
@@ -22,6 +23,7 @@ export function ConfirmDialog({
   title,
   children,
   confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   onConfirm,
 }: ConfirmDialogProps) {
   const [isPending, setIsPending] = useState(false);
@@ -65,7 +67,7 @@ export function ConfirmDialog({
           isDisabled={isPending}
           onPress={() => onOpenChange(false)}
         >
-          Cancel
+          {cancelLabel}
         </Button>
         <Button
           className={styles.button}

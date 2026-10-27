@@ -1,10 +1,3 @@
-/*
-
-Plan: add more than one theme later
-
-
-*/
-
 :root {
   /* --------------------------------------------- */
   /* Primitives (raw values) */
@@ -14,46 +7,57 @@ Plan: add more than one theme later
   --raw-navy-700: #0f2440;
 
   --raw-sky-100: #e0f2fe;
-  --raw-sky-300: #0284c7;
+  --raw-sky-400: #3b82f6;
   --raw-sky-500: #0369a1;
   --raw-sky-700: #075985;
+  --raw-sky-800: #0c4a6e;
 
   --raw-white: #ffffff;
-  --raw-cream: #eef3f8;
-  --raw-sand: #dfe8f0;
+  --raw-paper: #f4f7fa;
+  --raw-mist: #eaf0f6;
+  --raw-cloud: #f0f4f8;
 
-  --raw-gray-50: #f9fafb;
-  --raw-gray-100: #f3f4f6;
-  --raw-gray-200: #e5e7eb;
-  --raw-gray-300: #d1d5db;
-  --raw-gray-400: #9ca3af;
-  --raw-gray-500: #6b7280;
-  --raw-gray-600: #4b5563;
-  --raw-gray-700: #374151;
-  --raw-gray-800: #1f2937;
-  --raw-gray-900: #111827;
+  --raw-ink-950: #0b1a2b;
+  --raw-ink-900: #13263d;
+  --raw-ink-800: #1f3550;
+  --raw-ink-700: #475569;
+  --raw-ink-500: #5a6b7d;
 
-  --raw-sage: #5a7c58;
-  --raw-green: #22c55e;
-  --raw-amber: #b7791f;
-  --raw-brick: #9e4747;
-  --raw-steel: #4a6e85;
+  --raw-line-200: #e1e8ef;
+  --raw-line-300: #cfd9e3;
+  --raw-line-400: #aebdcc;
+
+  --raw-sage: #2f6b4f;
+  --raw-green: #3f8a5f;
+  --raw-green-100: #e7f2eb;
+  --raw-green-800: #24543e;
+
+  --raw-amber: #8a5a12;
+  --raw-amber-100: #fbf0dc;
+  --raw-amber-800: #6f460c;
+
+  --raw-brick: #9b3d3d;
+  --raw-brick-100: #f9e9e9;
+  --raw-steel: #3f6470;
+  --raw-steel-100: #e9f0f2;
+  --raw-neutral: #66757b;
+  --raw-neutral-100: #eef1f1;
 
   /* --------------------------------------------- */
   /* Semantic tokens - Light mode */
 
   /* Background and surface colors */
-  --color-app-bg: var(--raw-cream);
+  --color-app-bg: var(--raw-paper);
   --color-surface-bg: var(--raw-white);
-  --color-surface-bg-alt: var(--raw-sand);
-  --color-surface-hover: var(--raw-gray-100);
+  --color-surface-bg-alt: var(--raw-mist);
+  --color-surface-hover: var(--raw-cloud);
   --color-bg-inverse: var(--raw-navy-500);
   --color-modal-overlay: rgba(15, 36, 64, var(--opacity-overlay));
 
   /* Text colors */
-  --color-text-primary: #0f2440;
-  --color-text-secondary: #475569;
-  --color-text-muted: #5a6b7d;
+  --color-text-primary: var(--raw-navy-700);
+  --color-text-secondary: var(--raw-ink-700);
+  --color-text-muted: var(--raw-ink-500);
   --color-text-inverse: var(--raw-white);
 
   /* Brand colors */
@@ -64,28 +68,52 @@ Plan: add more than one theme later
   --color-brand-accent: var(--raw-sky-500);
   /* Darkens on hover: no lighter sky passes white-text contrast. */
   --color-brand-accent--hover: var(--raw-sky-700);
-  --color-brand-accent--active: var(--raw-sky-700);
-  --color-brand-accent--focus: var(--raw-sky-100);
+  --color-brand-accent--active: var(--raw-sky-800);
+  /* Mid-tone focus ring stays visible on both white and navy surfaces. */
+  --color-brand-accent--focus: var(--raw-sky-400);
+  --color-brand-accent-soft: var(--raw-sky-100);
 
   /* Border colors */
-  --color-border-subtle: var(--raw-gray-200);
-  --color-border-default: var(--raw-gray-300);
-  --color-border-strong: var(--raw-gray-400);
+  --color-border-subtle: var(--raw-line-200);
+  --color-border-default: var(--raw-line-300);
+  --color-border-strong: var(--raw-line-400);
 
+  /* Status colors */
   --color-success: var(--raw-sage);
+  --color-success-bg: var(--raw-green-100);
   --color-online: var(--raw-green);
   --color-warning: var(--raw-amber);
+  --color-warning-bg: var(--raw-amber-100);
   --color-danger: var(--raw-brick);
+  --color-danger-bg: var(--raw-brick-100);
   --color-info: var(--raw-steel);
+  --color-info-bg: var(--raw-steel-100);
+  --color-neutral: var(--raw-neutral);
+  --color-neutral-bg: var(--raw-neutral-100);
 
-  --color-neutral: var(--raw-gray-500);
+  /* Events */
+  --color-event-primary: var(--raw-sky-500);
+  --color-event-primary--hover: var(--raw-sky-700);
+  --color-event-primary--active: var(--raw-sky-800);
+  --color-event-soft: var(--raw-sky-100);
+  --color-event-success: var(--raw-green-800);
+  --color-event-success-bg: var(--raw-green-100);
+  --color-event-status-open-bg: var(--raw-green-100);
+  --color-event-status-open-text: var(--raw-green-800);
+  --color-event-status-registered-bg: var(--raw-sky-100);
+  --color-event-status-registered-text: var(--raw-sky-800);
+  --color-event-status-full-bg: var(--raw-amber-100);
+  --color-event-status-full-text: var(--raw-amber-800);
+  --color-event-status-closed-bg: var(--raw-neutral-100);
+  --color-event-status-closed-text: var(--raw-ink-700);
 
   /* --------------------------------------------- */
 
   /* Radius */
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-md: 8px;
+  --radius-event-card: 8px;
+  --radius-lg: 10px;
   --radius-pill: 999px;
 
   /* Spacing */
@@ -100,24 +128,25 @@ Plan: add more than one theme later
   --space-5xl: 3rem; /* 48px */
 
   /* Line heights */
-  --line-height-tight: 1.2;
+  --line-height-tight: 1.25;
   --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
+  --line-height-relaxed: 1.65;
 
   /* Typography */
-  --font-roboto: "Roboto";
   --font-family-sans:
     var(--font-roboto), Roboto, "Segoe UI", -apple-system, system-ui, BlinkMacSystemFont, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  /* Headings share the body family for a quieter, more systematic hierarchy. */
+  --font-family-serif: var(--font-family-sans);
 
   /* Font sizes */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.125rem;
-  --font-size-xl: 1.375rem;
-  --font-size-2xl: 1.75rem;
-  --font-size-3xl: 2rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
 
   /* Font Weights */
   --font-weight-thin: 100;
@@ -131,11 +160,11 @@ Plan: add more than one theme later
   --font-weight-black: 900;
 
   /* Layout */
-  --layout-header-height: 60px;
-  --layout-sidebar-width: 320px;
+  --layout-header-height: 56px;
+  --layout-sidebar-width: 260px;
   --layout-sidebar-width-collapsed: 80px;
 
-  --auth-content-max-width: 480px;
+  --auth-content-max-width: 420px;
 
   /* Z index */
   --z-dropdown: 1000;
@@ -145,9 +174,9 @@ Plan: add more than one theme later
   --z-progress-bar: 9999;
 
   /* Hover lift transforms */
-  --hover-lift-sm: translateY(-1px);
-  --hover-lift-md: translateY(-2px);
-  --hover-lift-lg: translateY(-4px);
+  --hover-lift-sm: translateY(0);
+  --hover-lift-md: translateY(0);
+  --hover-lift-lg: translateY(0);
 
   /* Icon sizes */
   --icon-size-xs: var(--space-md);
@@ -158,21 +187,21 @@ Plan: add more than one theme later
   --icon-size-2xl: var(--space-4xl);
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(15, 36, 64, 0.06);
-  --shadow-md: 0 4px 12px rgba(15, 36, 64, 0.1);
-  --shadow-lg: 0 10px 28px rgba(15, 36, 64, 0.14);
+  --shadow-sm: 0 1px 2px rgba(15, 36, 64, 0.05);
+  --shadow-md: 0 4px 16px rgba(15, 36, 64, 0.09);
+  --shadow-lg: 0 18px 48px rgba(15, 36, 64, 0.16);
 
   /* Transitions */
-  --transition-base: 180ms ease-in-out;
-  --transition-fast: 120ms ease-in-out;
-  --transition-slow: 260ms ease-in-out;
+  --transition-base: 160ms ease;
+  --transition-fast: 110ms ease;
+  --transition-slow: 240ms ease;
 
   /* Progress bar */
-  --progress-bar-height: 3px;
-  --progress-bar-animation-duration: 1.5s;
+  --progress-bar-height: 2px;
+  --progress-bar-animation-duration: 1.4s;
 
   /* Opacity  */
-  --opacity-overlay: 0.5;
+  --opacity-overlay: 0.42;
   --opacity-subtle: 0.2;
 
   /* Responsive */
@@ -184,6 +213,6 @@ Plan: add more than one theme later
 @media (min-width: 48rem) {
   :root {
     --page-padding: var(--space-3xl);
-    --modal-max-width: 700px;
+    --modal-max-width: 640px;
   }
 }

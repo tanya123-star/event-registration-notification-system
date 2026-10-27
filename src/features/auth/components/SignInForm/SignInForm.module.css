@@ -6,10 +6,8 @@
   .button {
     width: 100%;
     padding: var(--space-md);
-    border-color: var(--color-border-default);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semi-bold);
-    box-shadow: none;
   }
 
   .icon {

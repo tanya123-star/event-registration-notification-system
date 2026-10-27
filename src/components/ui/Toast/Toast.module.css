@@ -1,31 +1,31 @@
 .region {
   position: fixed;
-  bottom: var(--space-3xl);
   right: var(--space-3xl);
+  bottom: var(--space-3xl);
+  z-index: var(--z-toast);
   display: flex;
   flex-direction: column-reverse;
   gap: var(--space-sm);
   outline: none;
-  z-index: var(--z-toast);
-  border: var(--color-border-strong);
 
   &[data-focus-visible] {
-    outline: 2px solid var(--color-brand-accent--focus);
+    outline: 2px solid var(--color-brand-accent);
     outline-offset: 2px;
   }
 
   .toast {
     position: relative;
-    overflow: hidden;
-    width: 280px;
     display: flex;
     align-items: center;
     gap: var(--space-md);
+    width: 320px;
+    padding: var(--space-md) var(--space-lg);
+    overflow: hidden;
     background: var(--color-surface-bg);
-    border: 1px solid var(--color-border-strong);
-    box-shadow: var(--shadow-lg);
-    padding: var(--space-lg);
+    border: 1px solid var(--color-border-subtle);
+    border-left: 3px solid var(--color-border-default);
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
     outline: none;
     forced-color-adjust: none;
     animation: toast-slide-in var(--transition-slow);
@@ -79,7 +79,7 @@
     }
 
     &[data-focus-visible] {
-      outline: 2px solid var(--color-brand-accent--focus);
+      outline: 2px solid var(--color-brand-accent);
       outline-offset: 2px;
     }
 
@@ -90,8 +90,8 @@
 
     .content {
       display: flex;
-      flex-direction: column;
       flex: 1 1 auto;
+      flex-direction: column;
       min-width: 0;
 
       .title {
@@ -102,22 +102,24 @@
 
       .description {
         font-size: var(--font-size-xs);
+        line-height: var(--line-height-normal);
         color: var(--color-text-secondary);
       }
 
       .link {
         font-size: var(--font-size-xs);
         font-weight: var(--font-weight-medium);
-        color: var(--color-brand-primary);
+        color: var(--color-brand-accent);
         text-decoration: underline;
+        text-underline-offset: 2px;
         outline: none;
 
         &:hover {
-          color: var(--color-brand-accent);
+          color: var(--color-brand-accent--hover);
         }
 
         &:focus-visible {
-          outline: 2px solid var(--color-brand-accent--focus);
+          outline: 2px solid var(--color-brand-accent);
           outline-offset: 2px;
         }
       }
@@ -125,18 +127,18 @@
 
     .close {
       flex: 0 0 auto;
-      font-size: var(--font-size-md);
       width: var(--space-2xl);
       height: var(--space-2xl);
       padding: 0;
+      font-size: var(--font-size-md);
     }
 
     .progress {
       position: absolute;
-      left: 0;
       bottom: 0;
-      height: 2px;
+      left: 0;
       width: 100%;
+      height: 2px;
       transform-origin: left center;
       /* Must match TOAST_TIMEOUT in toast-utils.ts. */
       animation: toast-progress 5000ms linear forwards;
@@ -201,8 +203,8 @@
 @media (max-width: 48rem) {
   .region {
     right: 0;
-    left: 0;
     bottom: var(--space-lg);
+    left: 0;
     padding: var(--space-sm);
   }
 

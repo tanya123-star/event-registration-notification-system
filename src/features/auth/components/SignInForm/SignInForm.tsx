@@ -7,13 +7,22 @@ import { Button } from "@/components/ui/Button/Button";
 
 import styles from "./SignInForm.module.css";
 
-export function SignInForm() {
+interface SignInFormProps {
+  callbackUrl?: string;
+  loginHint?: string;
+}
+
+export function SignInForm({ callbackUrl = "/dashboard", loginHint }: SignInFormProps) {
+  const authorizationParams = loginHint
+    ? { login_hint: loginHint, prompt: "select_account" }
+    : undefined;
+
   return (
     <div className={styles.form}>
       <Button
-        variant="secondary"
+        variant="primary"
         className={styles.button}
-        onPress={() => void signIn("google", { callbackUrl: "/notifications" })}
+        onPress={() => void signIn("google", { callbackUrl }, authorizationParams)}
       >
         <FcGoogle aria-hidden="true" className={styles.icon} />
         Continue with Google

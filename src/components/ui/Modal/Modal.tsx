@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/Button/Button";
 import styles from "./Modal.module.css";
 
 interface ModalProps extends Omit<ModalOverlayProps, "className"> {
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   role?: "dialog" | "alertdialog";

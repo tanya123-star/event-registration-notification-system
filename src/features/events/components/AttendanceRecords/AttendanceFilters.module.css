@@ -1,0 +1,31 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background-color: var(--color-surface-bg);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+
+  .search {
+    flex: 1 1 18rem;
+  }
+
+  .select {
+    min-width: 12rem;
+    flex: 1 1 12rem;
+  }
+
+  .date {
+    min-width: 12rem;
+    flex: 1 1 12rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-left: auto;
+  }
+}

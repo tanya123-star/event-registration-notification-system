@@ -4,5 +4,5 @@ import { auth } from "@/lib/infra/auth";
 
 export default async function HomePage() {
   const session = await auth();
-  redirect(session?.user ? "/notifications" : "/sign-in");
+  redirect(session?.user ? "/dashboard" : "/sign-in");
 }

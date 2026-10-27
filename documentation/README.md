@@ -26,10 +26,11 @@ deliberate mirror is [RBAC.md](./RBAC.md), which must stay in sync with the perm
 | [NOTIFICATIONS.md](./NOTIFICATIONS.md)     | Audiences, visibility, sending, email delivery, and the notification feed. |
 | [DATA-MODEL.md](./DATA-MODEL.md)           | The main records, relationships, constraints, and event groundwork.        |
 | [RBAC.md](./RBAC.md)                       | The permission matrix mirrored by the server-side policy.                  |
-| [ROADMAP.md](./ROADMAP.md)                 | Current limitations, open decisions, and the planned event phase.          |
+| [ROADMAP.md](./ROADMAP.md)                 | Current limitations, already-recorded decisions, and the phases ahead.     |
 
 ## Scope
 
-The application is currently notification-first. Sign-in, invitations, user and club management, and notifications are
-working. Event management and registration are not built yet; the event tables and seed data are groundwork. See
-[ROADMAP.md](./ROADMAP.md) for the boundary and the decisions still to make.
+The application is currently notification-first and people-first. Sign-in, invitations, People management with a global
+President, and notifications are working. Event management, registration records, task assignment, and scan flow are
+still staged in-memory screens; the database groundwork is in place. See
+[ROADMAP.md](./ROADMAP.md) for the boundary and the phases ahead.

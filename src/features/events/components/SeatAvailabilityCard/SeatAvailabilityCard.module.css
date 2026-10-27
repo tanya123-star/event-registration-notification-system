@@ -1,0 +1,125 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  background-color: var(--color-surface-bg);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+
+  .heading {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semi-bold);
+    line-height: var(--line-height-tight);
+  }
+
+  .taken {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+    margin: 0;
+
+    .takenValue {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 1;
+      color: var(--color-text-primary);
+    }
+
+    .takenLabel {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .progress {
+    display: block;
+    width: 100%;
+    height: 6px;
+    overflow: hidden;
+    appearance: none;
+    background-color: var(--color-border-subtle);
+    border: none;
+    border-radius: var(--radius-pill);
+
+    &::-webkit-progress-bar {
+      background-color: var(--color-border-subtle);
+      border-radius: var(--radius-pill);
+    }
+
+    &::-webkit-progress-value {
+      background-color: var(--color-event-primary);
+      border-radius: var(--radius-pill);
+    }
+
+    &::-moz-progress-bar {
+      background-color: var(--color-event-primary);
+      border-radius: var(--radius-pill);
+    }
+  }
+
+  .remaining {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+
+    strong {
+      font-size: var(--font-size-md);
+      color: var(--color-event-primary);
+    }
+  }
+
+  .deadline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding-top: var(--space-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    border-top: 1px solid var(--color-border-subtle);
+
+    .deadlineLabel {
+      font-size: var(--font-size-xs);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+  }
+
+  .registerButton {
+    width: 100%;
+    margin-top: var(--space-sm);
+    color: var(--color-text-inverse);
+    background-color: var(--color-event-primary);
+    border-color: transparent;
+
+    &[data-hovered] {
+      background-color: var(--color-event-primary--hover);
+    }
+
+    &[data-pressed] {
+      background-color: var(--color-event-primary--active);
+    }
+
+    &[data-disabled] {
+      color: var(--color-text-muted);
+      background-color: var(--color-surface-hover);
+      border-color: var(--color-border-subtle);
+    }
+  }
+
+  .reason {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-secondary);
+  }
+
+  .note {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-muted);
+  }
+}

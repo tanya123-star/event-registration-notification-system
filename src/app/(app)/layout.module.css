@@ -19,7 +19,7 @@
       overflow-anchor: none;
       scroll-behavior: auto;
       contain: layout paint;
-      padding: var(--space-2xl) var(--page-padding);
+      padding: var(--space-3xl) var(--page-padding) var(--space-4xl);
     }
   }
 }

@@ -2,55 +2,34 @@
 
 ## What a notification is
 
-A notification is an announcement with a title, a body, and an audience. It records who sent it and when. It may target
-a club and may eventually link to an event, though the current composer does not offer the event link.
+A notification is a campus-wide announcement with a title and a body. It records who sent it and when. It may link to an
+event; the composer cannot attach an event yet.
 
 Each user has their own read receipts, which is how the feed knows what is unread.
 
 ## Audience and visibility
 
-The audience decides who a notification is for. The viewer's role and club decide what they can see.
+There is one audience in the active system: **Everyone (campus-wide)**. Every signed-in role can read notifications, and
+legacy club-scoped rows remain stored in the database but are hidden from every feed. Physical removal of those rows is
+part of the separately-approved cleanup migration (ADR-0009).
 
-| Audience | Intended recipients           |
-| -------- | ----------------------------- |
-| Everyone | The whole organisation.       |
-| Club     | Members of the selected club. |
-
-Admins and developers can read every notification. Officers and students can read organisation-wide notifications plus
-those for their own club. A user with no club sees organisation-wide notifications only.
-
-Admins are not treated as members of every club; they simply have an unrestricted read scope. Club membership is a
-single field on the user, so there is no multi-club rule to resolve.
+| Audience | Intended recipients     |
+| -------- | ----------------------- |
+| Everyone | The whole organisation. |
 
 ## Sending
 
 Sending requires the notification-create permission. Admins, developers, and officers have it; students do not. The feed
 hides the composer from students, and the server enforces the same rule.
 
-The composer asks for a title, a body, and an audience. Choosing a club audience reveals a required club picker;
-choosing everyone clears it. The server validates the same rules before writing.
-
-At present an officer can target any club, not only their own. That is the current permission policy, not a UI accident.
-If officers should be limited to their own club, the change belongs in the permission matrix and the notification docs
-together.
-
-After sending, the notification appears in the feed. Matching recipients are looked up and emailed as a separate step.
+The composer asks for a title and a body. The server validates the same rules before writing. After sending, the
+notification appears in every signed-in user's feed.
 
 ## Email delivery
 
-Email is sent through Nodemailer and the configured SMTP server. In local development the defaults point at Mailpit; in
-production they point at a real mail service.
-
-Only active school accounts receive notification email. External users can see the notification in the app but do not
-receive it by email. A club made up entirely of external accounts can therefore produce an in-app notification with no
-email recipients.
-
-Email is not part of the database transaction. The notification is created first and emailed afterwards. If SMTP fails,
-the action reports an error but the notification stays in the feed. There is no outbox, retry queue, or delivery
-tracking.
-
-The email body is assembled from the notification title and body. Sending is restricted to trusted roles; there is no
-separate HTML sanitisation layer.
+Notification email is intentionally not part of the current build. The shared `sendEmail` helper remains in place as the
+future seam, and the invitation email path still uses it, but the notification composer does not enqueue or await an email
+anymore. Turning notification email back on is a separate decision recorded in the roadmap.
 
 ## The feed
 
@@ -62,6 +41,7 @@ items. Search and filters are applied by the server rather than filtering a full
 
 Opening a notification shows its details and marks it as read. Read receipts are stored per user and notification, so
 opening the same item repeatedly is harmless. The feed updates locally, and the unread count is reduced immediately.
+The feed toolbar also lets the signed-in person mark every visible notification as read.
 
 The sidebar badge shows the unread count. It is refreshed periodically, when the tab becomes active again, and after a
 notification is marked read. A failed background refresh is ignored and corrected by the next successful refresh or page
@@ -69,8 +49,8 @@ load.
 
 ## What notifications do not do yet
 
-Notifications cannot be edited, deleted, scheduled, sent to an individual, or delivered as push notifications. There is
-no "mark all as read" action and no notification preference screen. The composer cannot attach an event.
+Notifications cannot be edited, deleted, scheduled, sent to an individual, delivered as push notifications, attached to
+an event from the composer, or emailed. There is no notification preference screen.
 
 These are current boundaries, not hidden features. [ROADMAP.md](./ROADMAP.md) covers the next phase.
 
@@ -78,4 +58,4 @@ These are current boundaries, not hidden features. [ROADMAP.md](./ROADMAP.md) co
 
 - [DATA-MODEL.md](./DATA-MODEL.md) describes the notification records.
 - [RBAC.md](./RBAC.md) contains the exact permissions.
-- [AUTH-AND-ACCESS.md](./AUTH-AND-ACCESS.md) explains how roles and clubs shape access.
+- [AUTH-AND-ACCESS.md](./AUTH-AND-ACCESS.md) explains how roles shape access.

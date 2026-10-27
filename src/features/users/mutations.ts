@@ -1,12 +1,17 @@
-import type { Role } from "@/generated/prisma/browser";
+import { OfficerPosition, Role } from "@/generated/prisma/browser";
 import { prisma } from "@/lib/infra/prisma";
 
 export interface PendingRoleAssignmentPayload {
   email: string;
   role: Role;
+  officerPosition: OfficerPosition | null;
   allowExternalEmail: boolean;
   assignedById: string;
-  clubId: string | null;
+}
+
+export interface OfficerPositionPayload {
+  userId: string;
+  officerPosition: OfficerPosition | null;
 }
 
 export async function ensureDeveloperUser(email: string): Promise<void> {
@@ -24,28 +29,61 @@ export async function ensureDeveloperUser(email: string): Promise<void> {
 }
 
 export async function updateUserRole(userId: string, role: Role): Promise<void> {
-  await prisma.user.update({ where: { id: userId }, data: { role } });
+  await prisma.user.update({
+    where: { id: userId },
+    data: { role, ...(role === Role.OFFICER ? {} : { officerPosition: null }) },
+  });
 }
 
 export async function setUserActive(userId: string, isActive: boolean): Promise<void> {
-  await prisma.user.update({ where: { id: userId }, data: { isActive } });
-}
-
-export async function setUserClub(userId: string, clubId: string | null): Promise<void> {
-  await prisma.user.update({ where: { id: userId }, data: { clubId } });
+  await prisma.user.update({
+    where: { id: userId },
+    data: { isActive, ...(isActive ? {} : { officerPosition: null }) },
+  });
 }
 
 export async function upsertPendingRoleAssignment(
   payload: PendingRoleAssignmentPayload,
 ): Promise<void> {
-  const { email, role, allowExternalEmail, assignedById, clubId } = payload;
+  const { email, role, allowExternalEmail, assignedById } = payload;
+  const officerPosition = role === Role.OFFICER ? payload.officerPosition : null;
   await prisma.pendingRoleAssignment.upsert({
     where: { email },
-    update: { role, allowExternalEmail, assignedById, clubId, assignedAt: new Date() },
-    create: { email, role, allowExternalEmail, assignedById, clubId },
+    update: {
+      role,
+      officerPosition,
+      allowExternalEmail,
+      assignedById,
+      assignedAt: new Date(),
+    },
+    create: { email, role, officerPosition, allowExternalEmail, assignedById },
   });
 }
 
 export async function deletePendingRoleAssignment(roleAssignmentId: string): Promise<void> {
   await prisma.pendingRoleAssignment.delete({ where: { id: roleAssignmentId } });
+}
+
+export async function setOfficerPosition(payload: OfficerPositionPayload): Promise<void> {
+  const { userId, officerPosition } = payload;
+  await prisma.$transaction(async (tx) => {
+    const target = await tx.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    if (!target) throw new Error("User not found");
+    if (target.role !== Role.OFFICER) throw new Error("Only officers can hold a position");
+
+    if (officerPosition === OfficerPosition.PRESIDENT) {
+      await tx.user.updateMany({
+        where: {
+          officerPosition: OfficerPosition.PRESIDENT,
+          id: { not: userId },
+        },
+        data: { officerPosition: null },
+      });
+    }
+
+    await tx.user.update({ where: { id: userId }, data: { officerPosition } });
+  });
 }

@@ -4,6 +4,7 @@ import Google from "next-auth/providers/google";
 
 import { Role } from "@/generated/prisma/browser";
 import { getOptionalEnvVar, getRequiredEnvVar } from "@/lib/infra/env";
+import { applyPendingAssignment } from "@/lib/infra/pending-user";
 import { getAuthAdapterClient } from "@/lib/infra/prisma";
 import { isAllowedEmail, isSchoolEmail } from "@/lib/security/email-domain";
 
@@ -13,15 +14,12 @@ import { isAllowedEmail, isSchoolEmail } from "@/lib/security/email-domain";
  * The `signIn` callback gates access by school-domain email (or an approved
  * external address), bootstrap `DEV_EMAIL`, pending role assignments, and
  * active-user status; the `session` callbacks refresh the database `id`,
- * `role`, `isActive`, and `clubId` onto the JWT and session so deactivated
- * users can be redirected to the notice page without being silently sent to
- * sign-in.
+ * `role`, `isActive`, and `officerPosition` onto the JWT and session so
+ * deactivated users and replaced Presidents are updated without signing out.
  *
  * Exports the route `handlers`, `signIn`/`signOut` helpers, and the `auth()`
  * session getter.
  */
-const googleCredentials = getGoogleCredentials(isDevLoginEnabled());
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(getAuthAdapterClient()),
   providers: [
@@ -47,13 +45,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.provider !== "google" || !emailVerified || !user.email) return false;
 
       const email = user.email.toLowerCase();
-      const existingUser = await getAuthAdapterClient().user.findUnique({ where: { email } });
+      const existingUser = await getAuthAdapterClient().user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+          name: true,
+          role: true,
+          isActive: true,
+          allowExternalEmail: true,
+        },
+      });
       if (existingUser && !existingUser.isActive) return "/auth/error?error=Deactivated";
 
       const pending = existingUser
         ? null
         : await getAuthAdapterClient().pendingRoleAssignment.findUnique({
             where: { email },
+            select: {
+              role: true,
+              officerPosition: true,
+              allowExternalEmail: true,
+            },
           });
       const devEmailRaw = getOptionalEnvVar("DEV_EMAIL", "");
       const devEmail = devEmailRaw ? devEmailRaw.toLowerCase() : undefined;
@@ -70,22 +82,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       if (!existingUser) {
         const role = devEmail === email ? Role.DEV : (pending?.role ?? Role.STUDENT);
+        const officerPosition = role === Role.OFFICER ? (pending?.officerPosition ?? null) : null;
+        const externalAllowed = allowExternalEmail && !isSchoolEmail(email);
         try {
-          await getAuthAdapterClient().user.create({
-            data: {
-              email,
+          if (pending && role !== Role.DEV) {
+            await applyPendingAssignment(email, {
               name: user.name ?? email,
-              image: user.image,
+              image: user.image ?? null,
               role,
-              allowExternalEmail: allowExternalEmail && !isSchoolEmail(email),
-              clubId: pending?.clubId ?? null,
-            },
-          });
-          if (pending)
-            await getAuthAdapterClient().pendingRoleAssignment.delete({ where: { email } });
+              officerPosition,
+              allowExternalEmail: externalAllowed,
+            });
+          } else {
+            await getAuthAdapterClient().user.create({
+              data: {
+                email,
+                name: user.name ?? email,
+                image: user.image,
+                role,
+                officerPosition,
+                allowExternalEmail: externalAllowed,
+              },
+            });
+            if (pending) {
+              await getAuthAdapterClient().pendingRoleAssignment.delete({ where: { email } });
+            }
+          }
         } catch (error) {
           const concurrentUser = await getAuthAdapterClient().user.findUnique({
             where: { email },
+            select: { id: true },
           });
           if (!concurrentUser) throw error;
         }
@@ -104,7 +130,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       const user = await getAuthAdapterClient().user.findUnique({
         where: { email: token.email },
-        select: { id: true, role: true, isActive: true, clubId: true },
+        select: { id: true, role: true, isActive: true, officerPosition: true },
       });
 
       if (!user) return null;
@@ -112,7 +138,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       token.id = user.id;
       token.role = user.role;
       token.isActive = user.isActive;
-      token.clubId = user.clubId;
+      token.officerPosition = user.officerPosition;
       return token;
     },
 
@@ -121,7 +147,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id ?? "";
         session.user.role = token.role ?? Role.STUDENT;
         session.user.isActive = token.isActive !== false;
-        session.user.clubId = token.clubId ?? null;
+        session.user.officerPosition = token.officerPosition ?? null;
       }
       return session;
     },

@@ -1,6 +1,5 @@
 "use server";
 
-import { getClubById } from "@/features/clubs/queries";
 import { Role } from "@/generated/prisma/browser";
 import { sendEmail } from "@/lib/messaging/email";
 import type { PageQuery } from "@/lib/primitives/types";
@@ -17,13 +16,13 @@ import { toActionResponse } from "@/lib/security/errors";
 
 import {
   deletePendingRoleAssignment,
+  setOfficerPosition,
   setUserActive,
-  setUserClub,
   updateUserRole,
   upsertPendingRoleAssignment,
 } from "./mutations";
 import {
-  countActivePrivilegedUsers,
+  countActiveAdmins,
   getUserById,
   getUserManagementPage,
   type UserManagementPage,
@@ -31,19 +30,19 @@ import {
 import {
   AddPendingUserSchema,
   PendingRoleAssignmentIdSchema,
+  SetOfficerPositionSchema,
   SetUserActiveSchema,
-  SetUserClubSchema,
   UpdateUserRoleSchema,
   UserManagementPageQuerySchema,
   type AddPendingUserPayload,
   type PendingRoleAssignmentIdPayload,
+  type SetOfficerPositionPayload,
   type SetUserActivePayload,
-  type SetUserClubPayload,
   type UpdateUserRolePayload,
 } from "./schemas";
 
 /**
- * Reads a cursor page of users and pending role assignments for the admin table.
+ * Reads a cursor page of users and pending role assignments for the People table.
  *
  * @param query - Search, cursor, page-size, role, and status parameters.
  * @returns A cursor page of merged user/pending-assignment rows.
@@ -63,49 +62,49 @@ export async function getUserManagementPageAction(query: PageQuery): Promise<Use
 }
 
 /**
- * Updates a user's role while protecting developer and last-admin accounts.
+ * Updates a user's role while protecting developer, self, and last-admin accounts.
  *
  * @param payload - The target `userId` and the new `role`.
- * @returns `success: true` plus `selfDemoted`, or an invalid/not-found/conflict envelope.
+ * @returns `success: true`, or an invalid/not-found/conflict envelope.
  * @throws {ForbiddenError} When the caller lacks `user.update`.
  */
 export async function updateUserRoleAction(
   payload: UpdateUserRolePayload,
-): Promise<ActionDataResponse<{ selfDemoted: boolean }>> {
+): Promise<ActionStatusResponse> {
   try {
     const actor = await requirePermission("user.update");
     const parsed = UpdateUserRoleSchema.safeParse(payload);
     if (!parsed.success) return actionInvalid("user role");
     const target = await getUserById(parsed.data.userId);
     if (!target) return actionNotFound("User");
+    if (actor.id === target.id)
+      return actionConflict(
+        "Cannot change your own role",
+        "Ask another administrator to change your role.",
+      );
     if (target.role === Role.DEV)
       return actionConflict(
         "Developer account",
         "Developer accounts cannot be assigned through this form.",
       );
-    if (target.role === Role.ADMIN && parsed.data.role !== Role.ADMIN) {
-      const remaining = await countActivePrivilegedUsers(target.id);
+    if (target.role === Role.ADMIN && target.isActive && parsed.data.role !== Role.ADMIN) {
+      const remaining = await countActiveAdmins(target.id);
       if (remaining === 0) {
         return actionConflict(
           "Last administrator",
-          "Cannot remove the last active administrator. Assign another administrator or developer first.",
+          "Cannot remove the last active administrator. Assign another administrator first.",
         );
       }
     }
     await updateUserRole(parsed.data.userId, parsed.data.role);
-    return {
-      success: true,
-      data: {
-        selfDemoted: actor.id === parsed.data.userId && parsed.data.role !== Role.ADMIN,
-      },
-    };
+    return { success: true };
   } catch (error) {
     return toActionResponse(error, "update user role");
   }
 }
 
 /**
- * Activates or deactivates a user, protecting the last privileged account.
+ * Activates or deactivates a user, protecting the last active administrator.
  *
  * @param payload - The target `userId` and the desired `isActive` state.
  * @returns `success: true` plus `selfDeactivated`, or an error envelope.
@@ -115,24 +114,24 @@ export async function setUserActiveAction(
   payload: SetUserActivePayload,
 ): Promise<ActionDataResponse<{ selfDeactivated: boolean }>> {
   try {
-    const session = await requirePermission("user.update");
+    const actor = await requirePermission("user.update");
     const parsed = SetUserActiveSchema.safeParse(payload);
     if (!parsed.success) return actionInvalid("user status");
     const target = await getUserById(parsed.data.userId);
     if (!target) return actionNotFound("User");
-    if (!parsed.data.isActive && (target.role === Role.ADMIN || target.role === Role.DEV)) {
-      const remaining = await countActivePrivilegedUsers(target.id);
+    if (!parsed.data.isActive && target.role === Role.ADMIN && target.isActive) {
+      const remaining = await countActiveAdmins(target.id);
       if (remaining === 0) {
         return actionConflict(
           "Last administrator",
-          "Cannot deactivate the last active administrator or developer. Assign another administrator or developer first.",
+          "Cannot deactivate the last active administrator. Assign another administrator first.",
         );
       }
     }
     await setUserActive(parsed.data.userId, parsed.data.isActive);
     return {
       success: true,
-      data: { selfDeactivated: parsed.data.userId === session.id && !parsed.data.isActive },
+      data: { selfDeactivated: parsed.data.userId === actor.id && !parsed.data.isActive },
     };
   } catch (error) {
     return toActionResponse(error, "update user status");
@@ -142,7 +141,7 @@ export async function setUserActiveAction(
 /**
  * Creates or refreshes a pending role assignment and emails the invitation.
  *
- * @param payload - The email, role, optional club id, and external-email approval.
+ * @param payload - The email, role, optional position, and external-email approval.
  * @returns `success: true`, or an invalid/not-found envelope.
  * @throws {ForbiddenError} When the caller lacks `user.create`.
  */
@@ -150,21 +149,17 @@ export async function addPendingUserAction(
   payload: AddPendingUserPayload,
 ): Promise<ActionStatusResponse> {
   try {
-    const session = await requirePermission("user.create");
+    const actor = await requirePermission("user.create");
     const parsed = AddPendingUserSchema.safeParse(payload);
     if (!parsed.success) return actionInvalid("pending user");
-    if (parsed.data.clubId) {
-      const club = await getClubById(parsed.data.clubId);
-      if (!club) return actionNotFound("Club");
-    }
     const email = parsed.data.email.toLowerCase();
     const allowExternalEmail = parsed.data.allowExternalEmail && !isSchoolEmail(email);
     await upsertPendingRoleAssignment({
       email,
       role: parsed.data.role,
+      officerPosition: parsed.data.officerPosition,
       allowExternalEmail,
-      assignedById: session.id,
-      clubId: parsed.data.clubId,
+      assignedById: actor.id,
     });
     const signInHint = allowExternalEmail
       ? "Sign in with the Google account associated with this email address to get started."
@@ -181,29 +176,38 @@ export async function addPendingUserAction(
 }
 
 /**
- * Assigns a user to a club, or clears the assignment when `clubId` is null.
+ * Sets, replaces, or removes a global officer position.
  *
- * @param payload - The target `userId` and optional `clubId`.
- * @returns `success: true`, or an invalid/not-found envelope.
- * @throws {ForbiddenError} When the caller lacks `user.update`.
+ * Replacing a President clears the previous President and promotes the target
+ * in one transaction. Only Admins hold `officer.assign_president`.
+ *
+ * @param payload - The target `userId` and the new `officerPosition` (or null).
+ * @returns `success: true`, or an invalid/not-found/conflict envelope.
+ * @throws {ForbiddenError} When the caller lacks `officer.assign_president`.
  */
-export async function setUserClubAction(
-  payload: SetUserClubPayload,
+export async function setOfficerPositionAction(
+  payload: SetOfficerPositionPayload,
 ): Promise<ActionStatusResponse> {
   try {
-    await requirePermission("user.update");
-    const parsed = SetUserClubSchema.safeParse(payload);
-    if (!parsed.success) return actionInvalid("club assignment");
+    await requirePermission("officer.assign_president");
+    const parsed = SetOfficerPositionSchema.safeParse(payload);
+    if (!parsed.success) return actionInvalid("officer position");
     const target = await getUserById(parsed.data.userId);
     if (!target) return actionNotFound("User");
-    if (parsed.data.clubId) {
-      const club = await getClubById(parsed.data.clubId);
-      if (!club) return actionNotFound("Club");
-    }
-    await setUserClub(parsed.data.userId, parsed.data.clubId);
+    if (target.role !== Role.OFFICER)
+      return actionConflict("Not an officer", "Only an officer can hold a position.");
+    if (!target.isActive)
+      return actionConflict(
+        "Inactive officer",
+        "Reactivate this officer before setting a position.",
+      );
+    await setOfficerPosition({
+      userId: parsed.data.userId,
+      officerPosition: parsed.data.officerPosition,
+    });
     return { success: true };
   } catch (error) {
-    return toActionResponse(error, "assign club");
+    return toActionResponse(error, "set officer position");
   }
 }
 

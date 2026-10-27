@@ -1,21 +1,23 @@
 .header {
   height: var(--layout-header-height);
   background-color: var(--color-surface-bg);
-  border-bottom: 1px solid var(--color-border-default);
+  border-bottom: 1px solid var(--color-border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-lg);
   padding: 0 var(--space-3xl);
 
   .leftGroup {
     display: flex;
     align-items: center;
-    gap: var(--space-lg);
+    gap: var(--space-sm);
+    min-width: 0;
 
     .hamburgerButton {
       display: none;
-      color: var(--color-text-primary);
       padding: var(--space-xs);
+      color: var(--color-text-secondary);
 
       svg {
         width: var(--icon-size-sm);
@@ -25,35 +27,77 @@
   }
 
   .pageTitle {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-brand-primary);
     margin: 0;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semi-bold);
+    color: var(--color-text-primary);
   }
 
   .rightSection {
     display: flex;
     align-items: center;
-    gap: var(--space-2xl);
+    gap: var(--space-lg);
+
+    .bellButton {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      padding: 0;
+      color: var(--color-text-secondary);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition:
+        background-color var(--transition-base),
+        color var(--transition-base);
+
+      svg {
+        width: var(--icon-size-sm);
+        height: var(--icon-size-sm);
+      }
+
+      &[data-hovered] {
+        color: var(--color-text-primary);
+        background-color: var(--color-surface-hover);
+      }
+
+      &[data-focus-visible] {
+        outline: 2px solid var(--color-brand-accent);
+        outline-offset: 2px;
+      }
+
+      .bellDot {
+        position: absolute;
+        top: 9px;
+        right: 9px;
+        width: 6px;
+        height: 6px;
+        border: 2px solid var(--color-surface-bg);
+        border-radius: 50%;
+        background-color: var(--color-brand-accent);
+      }
+    }
 
     .userSection {
       display: flex;
       align-items: center;
-      gap: var(--space-md);
+      gap: var(--space-sm);
 
       .userProfile {
-        width: 2rem;
-        height: 2rem;
-        border-radius: var(--radius-pill);
-        border: 1px solid var(--color-border-subtle);
-        background-color: var(--color-brand-accent);
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--color-text-inverse);
-        font-weight: var(--font-weight-bold);
+        width: 2rem;
+        height: 2rem;
         font-size: var(--font-size-sm);
-        position: relative;
+        font-weight: var(--font-weight-semi-bold);
+        color: var(--color-brand-accent);
+        background-color: var(--color-brand-accent-soft);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: var(--radius-pill);
 
         .avatar {
           width: 100%;
@@ -71,13 +115,13 @@
       .nameRoleContainer {
         display: flex;
         flex-direction: column;
+        gap: 0;
         line-height: var(--line-height-tight);
-        gap: 0px;
 
         .userName {
           font-size: var(--font-size-sm);
           font-weight: var(--font-weight-medium);
-          color: var(--color-text-secondary);
+          color: var(--color-text-primary);
         }
 
         .userRole {
@@ -93,25 +137,33 @@
 /* Mobile overrides */
 @media (max-width: 48rem) {
   .header {
+    gap: var(--space-sm);
     padding: 0 var(--space-lg);
 
     .leftGroup {
-      min-width: 0;
       flex: 1;
+      min-width: 0;
+
       .hamburgerButton {
         display: flex;
       }
 
       .pageTitle {
-        font-size: var(--font-size-md);
-        white-space: nowrap;
         overflow: hidden;
+        font-size: var(--font-size-md);
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
 
     .rightSection {
       flex-shrink: 0;
+      gap: var(--space-xs);
+
+      .bellButton {
+        width: 2rem;
+        height: 2rem;
+      }
 
       .userSection {
         .nameRoleContainer {

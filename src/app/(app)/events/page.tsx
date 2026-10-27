@@ -1,11 +1,17 @@
-import { getEventsAction } from "@/features/events/actions";
-import { EventsList } from "@/features/events/components/EventsList/EventsList";
-import { requireAuth } from "@/lib/security/auth-guards";
-import { can } from "@/lib/security/rbac";
+import { EventsBrowser } from "@/features/events/components/EventsBrowser/EventsBrowser";
+import { getPublishedEvents } from "@/features/events/queries";
+import { Role } from "@/generated/prisma/browser";
+import { auth } from "@/lib/infra/auth";
 
-export default async function EventsPage() {
-  const user = await requireAuth();
-  const rows = await getEventsAction();
+interface EventsPageProps {
+  searchParams: Promise<{ status?: string }>;
+}
 
-  return <EventsList initialRows={rows} canPublish={can(user.role, "publishEvent")} />;
+export default async function EventsPage({ searchParams }: EventsPageProps) {
+  const { status } = await searchParams;
+  const session = await auth();
+  const studentId = session?.user?.role === Role.STUDENT ? session.user.id : undefined;
+  const events = await getPublishedEvents({ studentId });
+
+  return <EventsBrowser events={events} initialStatus={status === "open" ? "open" : "all"} />;
 }

@@ -1,0 +1,87 @@
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  text-align: left;
+
+  .qrPanel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 14rem;
+    padding: var(--space-md);
+    background-color: var(--color-surface-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+
+    &[data-failed] {
+      background-color: var(--color-surface-hover);
+    }
+
+    .qr {
+      width: 100%;
+      max-width: 13.75rem;
+      height: auto;
+    }
+
+    .qrPlaceholder {
+      width: 100%;
+      max-width: 13.75rem;
+      aspect-ratio: 1;
+      background-color: var(--color-surface-hover);
+      border-radius: var(--radius-sm);
+    }
+
+    .qrFallback {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+  }
+
+  .referenceBlock {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background-color: var(--color-surface-hover);
+    border-radius: var(--radius-sm);
+
+    .referenceText {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .referenceLabel {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    .reference {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semi-bold);
+      letter-spacing: 0.02em;
+      color: var(--color-text-primary);
+      overflow-wrap: anywhere;
+    }
+
+    .copyButton {
+      flex-shrink: 0;
+      color: var(--color-event-primary);
+
+      &[data-hovered] {
+        background-color: var(--color-event-soft);
+      }
+    }
+  }
+
+  .note {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-muted);
+  }
+}
